@@ -1,0 +1,292 @@
+<!-- ═══════════════════════════════════════════════════════════
+     YUNUS AUTO GARAGE — Aksaray Oto Elektrik Tek Sayfa Site
+     ═══════════════════════════════════════════════════════════ -->
+
+<!-- ─── STICKY HEADER ──────────────────────────────────────────── -->
+<header class="sticky-header" role="banner">
+  <div class="header-inner">
+    <div class="brand">
+      <span class="brand-icon" aria-hidden="true">⚡</span>
+      <div class="brand-text">
+        <span class="brand-name">{{ config.BUSINESS_NAME }}</span>
+        <span class="brand-sub">Aksaray Oto Elektrik</span>
+      </div>
+    </div>
+    <nav class="header-cta" aria-label="İletişim">
+      <a [href]="phoneHref" class="btn btn-call" aria-label="Hemen ara">
+        <span class="btn-icon" aria-hidden="true">📞</span>
+        <span>Ara</span>
+      </a>
+      <a [href]="whatsappHref" class="btn btn-whatsapp" aria-label="WhatsApp'tan yaz" target="_blank" rel="noopener">
+        <span class="btn-icon" aria-hidden="true">💬</span>
+        <span>WhatsApp</span>
+      </a>
+    </nav>
+  </div>
+</header>
+
+<!-- ─── HERO ────────────────────────────────────────────────────── -->
+<section class="hero" aria-labelledby="hero-title">
+  <div class="hero-inner">
+    <div class="hero-badges">
+      <span class="badge">⚡ 7/24 Yol Yardım</span>
+      <span class="badge">🔧 Yerinde Servis</span>
+      <span class="badge">✅ Garantili İşçilik</span>
+    </div>
+    <h1 id="hero-title">
+      Aksaray Oto Elektrik<br />
+      <span class="hero-sub-title">68 Aksaray Oto Elektrikçi</span>
+    </h1>
+    <p class="hero-lead">
+      Aksaray sanayi sitesinde hızlı arıza tespiti ve onarım.
+      Yolda kaldınız mı? <strong>Hemen ulaşın, yerinize geliyoruz.</strong>
+    </p>
+    <div class="hero-cta">
+      <a [href]="phoneHref" class="btn btn-call btn-lg" aria-label="Hemen ara">
+        📞 Hemen Ara
+      </a>
+      <a [href]="whatsappHref" class="btn btn-whatsapp btn-lg" aria-label="WhatsApp'tan yaz" target="_blank" rel="noopener">
+        💬 WhatsApp'tan Yaz
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ─── HAKKIMIZDA ──────────────────────────────────────────────── -->
+<section class="about section" id="hakkimizda" aria-labelledby="about-title">
+  <div class="container">
+    <h2 id="about-title">Hakkımızda</h2>
+    <div class="about-content">
+      <div class="about-text">
+        <p>
+          <strong>Yunus Auto Garage</strong> olarak Aksaray sanayi sitesinde yılların tecrübesiyle
+          oto elektrik hizmeti sunuyoruz. Her marka ve model araca bilgisayarlı diagnostik,
+          arıza tespiti ve onarım yapıyoruz.
+        </p>
+        <p>
+          Müşteri memnuniyeti ve kaliteli işçilik önceliğimizdir. Aksaray ve çevresinde
+          yolda kalan sürücülere yerinde müdahale desteği sağlıyoruz.
+        </p>
+        <ul class="about-highlights">
+          <li>✅ Deneyimli oto elektrik ustası</li>
+          <li>✅ Bilgisayarlı OBD arıza tespiti</li>
+          <li>✅ Her marka ve model araç</li>
+          <li>✅ Aksaray merkez ve ilçelerine hizmet</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── HİZMETLER ───────────────────────────────────────────────── -->
+<section class="services section" id="hizmetler" aria-labelledby="services-title">
+  <div class="container">
+    <h2 id="services-title">Hizmetlerimiz</h2>
+    <p class="section-lead">Aksaray oto elektrik ihtiyaçlarınız için kapsamlı çözümler</p>
+    <div class="services-grid">
+      @for (service of config.SERVICES; track service.title) {
+        <article class="service-card">
+          <div class="service-icon" aria-hidden="true">{{ service.icon }}</div>
+          <h3>{{ service.title }}</h3>
+          <p>{{ service.description }}</p>
+        </article>
+      }
+    </div>
+  </div>
+</section>
+
+<!-- ─── NEDEN BİZ ────────────────────────────────────────────────── -->
+<section class="why section" id="neden-biz" aria-labelledby="why-title">
+  <div class="container">
+    <h2 id="why-title">Neden Yunus Auto Garage?</h2>
+    <div class="why-grid">
+      <div class="why-card">
+        <div class="why-icon" aria-hidden="true">⚡</div>
+        <h3>Hızlı Servis</h3>
+        <p>Yolda kaldığınızda en kısa sürede yanınızdayız. Aksaray içi yerinde müdahale.</p>
+      </div>
+      <div class="why-card">
+        <div class="why-icon" aria-hidden="true">🛡️</div>
+        <h3>Garantili İşçilik</h3>
+        <p>Yaptığımız tüm onarımlar garantilidir. İşimizin arkasındayız.</p>
+      </div>
+      <div class="why-card">
+        <div class="why-icon" aria-hidden="true">🔍</div>
+        <h3>Bilgisayarlı Teşhis</h3>
+        <p>OBD diagnostik cihazlarıyla doğru arıza tespiti, gereksiz masrafı önler.</p>
+      </div>
+      <div class="why-card">
+        <div class="why-icon" aria-hidden="true">💰</div>
+        <h3>Uygun Fiyat</h3>
+        <p>Aksaray'da rekabetçi fiyatlarla kaliteli oto elektrik hizmeti.</p>
+      </div>
+      <div class="why-card">
+        <div class="why-icon" aria-hidden="true">🔧</div>
+        <h3>Her Marka Araç</h3>
+        <p>Yerli ve yabancı tüm marka araçlara oto elektrik hizmeti veriyoruz.</p>
+      </div>
+      <div class="why-card">
+        <div class="why-icon" aria-hidden="true">📍</div>
+        <h3>Merkezi Konum</h3>
+        <p>Aksaray sanayi sitesinde kolayca ulaşabileceğiniz merkezi konumumuzla hizmetinizdeyiz.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── KONUM ─────────────────────────────────────────────────────── -->
+<section class="location section" id="konum" aria-labelledby="location-title">
+  <div class="container">
+    <h2 id="location-title">Konum &amp; Adres</h2>
+    <div class="location-layout">
+      <div class="location-info">
+        <address class="address-block">
+          <div class="address-line">
+            <span aria-hidden="true">📍</span>
+            <span>{{ config.STREET_ADDRESS }}, {{ config.CITY }}/{{ config.REGION }}</span>
+          </div>
+          <div class="address-line">
+            <span aria-hidden="true">📞</span>
+            <a [href]="phoneHref">0{{ config.PHONE_DIGITS }}</a>
+          </div>
+          <div class="address-line">
+            <span aria-hidden="true">🕐</span>
+            <div>
+              <div>{{ config.OPENING_HOURS_DISPLAY }}</div>
+              <div>{{ config.OPENING_HOURS_SUNDAY }}</div>
+            </div>
+          </div>
+        </address>
+        <a [href]="directionsHref" class="btn btn-directions" target="_blank" rel="noopener" aria-label="Google Maps'te yol tarifi al">
+          🗺️ Yol Tarifi Al
+        </a>
+      </div>
+
+      <!-- Maps Facade: tıklanınca yükle (performans için) -->
+      <div class="map-wrapper">
+        @if (!mapLoaded()) {
+          <button
+            class="map-facade"
+            (click)="loadMap()"
+            aria-label="Haritayı yükle ve göster"
+            type="button"
+          >
+            <div class="map-facade-content">
+              <span class="map-icon" aria-hidden="true">🗺️</span>
+              <span class="map-text">Haritayı Göster</span>
+              <span class="map-hint">Tıklayarak yükleyin</span>
+            </div>
+          </button>
+        } @else {
+          <iframe
+            [src]="safeMapUrl"
+            width="100%"
+            height="350"
+            style="border:0"
+            allowfullscreen
+            loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade"
+            title="Yunus Auto Garage Aksaray harita konumu"
+          ></iframe>
+        }
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── ÇALIŞMA SAATLERİ ─────────────────────────────────────────── -->
+<section class="hours section" id="calisma-saatleri" aria-labelledby="hours-title">
+  <div class="container">
+    <h2 id="hours-title">Çalışma Saatleri</h2>
+    <table class="hours-table" aria-label="Çalışma saatleri tablosu">
+      <tbody>
+        <tr>
+          <td>Pazartesi – Cuma</td>
+          <td><strong>08:30 – 19:00</strong></td>
+        </tr>
+        <tr>
+          <td>Cumartesi</td>
+          <td><strong>08:30 – 19:00</strong></td>
+        </tr>
+        <tr class="closed-row">
+          <td>Pazar</td>
+          <td><span class="closed-badge">Kapalı</span></td>
+        </tr>
+      </tbody>
+    </table>
+    <p class="hours-note">
+      ⚡ <strong>Acil yol yardım</strong> için her zaman arayabilirsiniz —
+      <a [href]="phoneHref">0{{ config.PHONE_DIGITS }}</a>
+    </p>
+  </div>
+</section>
+
+<!-- ─── İLETİŞİM ─────────────────────────────────────────────────── -->
+<section class="contact section" id="iletisim" aria-labelledby="contact-title">
+  <div class="container">
+    <h2 id="contact-title">İletişim</h2>
+    <div class="contact-grid">
+      <a [href]="phoneHref" class="contact-card" aria-label="Telefon ile ara">
+        <span class="contact-icon" aria-hidden="true">📞</span>
+        <span class="contact-label">Telefon</span>
+        <span class="contact-value">0{{ config.PHONE_DIGITS }}</span>
+        <span class="contact-action btn btn-call">Hemen Ara</span>
+      </a>
+      <a [href]="whatsappHref" class="contact-card" aria-label="WhatsApp ile yaz" target="_blank" rel="noopener">
+        <span class="contact-icon" aria-hidden="true">💬</span>
+        <span class="contact-label">WhatsApp</span>
+        <span class="contact-value">0{{ config.WHATSAPP_DIGITS }}</span>
+        <span class="contact-action btn btn-whatsapp">Mesaj Gönder</span>
+      </a>
+      <div class="contact-card contact-card--address">
+        <span class="contact-icon" aria-hidden="true">📍</span>
+        <span class="contact-label">Adres</span>
+        <address class="contact-value">
+          {{ config.STREET_ADDRESS }}<br />
+          {{ config.CITY }} / {{ config.REGION }}
+        </address>
+        <a [href]="directionsHref" class="contact-action btn btn-directions" target="_blank" rel="noopener">
+          Yol Tarifi Al
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── FOOTER ───────────────────────────────────────────────────── -->
+<footer class="footer" role="contentinfo">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <span class="footer-logo" aria-hidden="true">⚡</span>
+        <strong>{{ config.BUSINESS_NAME }}</strong>
+        <span>Aksaray Oto Elektrikçi</span>
+      </div>
+      <address class="footer-contact">
+        <div>{{ config.STREET_ADDRESS }}</div>
+        <div>{{ config.CITY }} / {{ config.REGION }}</div>
+        <a [href]="phoneHref">0{{ config.PHONE_DIGITS }}</a>
+      </address>
+      <div class="footer-area">
+        <strong>Hizmet Bölgesi</strong>
+        <span>Aksaray merkez ve çevresi</span>
+        <span class="footer-keywords">Aksaray oto elektrik · 68 oto elektrikçi · sanayi sitesi elektrikçi</span>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; {{ currentYear }} {{ config.BUSINESS_NAME }}. Tüm hakları saklıdır.</p>
+    </div>
+  </div>
+</footer>
+
+<!-- ─── MOBİL FLOATING BUTONLAR ──────────────────────────────────── -->
+<div class="mobile-float" role="complementary" aria-label="Hızlı iletişim butonları">
+  <a [href]="phoneHref" class="float-btn float-call" aria-label="Hemen ara">
+    <span aria-hidden="true">📞</span>
+    <span>Ara</span>
+  </a>
+  <a [href]="whatsappHref" class="float-btn float-whatsapp" aria-label="WhatsApp'tan yaz" target="_blank" rel="noopener">
+    <span aria-hidden="true">💬</span>
+    <span>WhatsApp</span>
+  </a>
+</div>
