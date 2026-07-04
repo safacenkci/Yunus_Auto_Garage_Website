@@ -1,32 +1,37 @@
 // ============================================================
 //  SITE KONFİGÜRASYON DOSYASI
-//  Gerçek verileri aşağıdaki alanlara girin.
-//  Tüm {{PLACEHOLDER}} ifadeleri index.html içinde de mevcuttur.
+//  İşletme bilgileri burada tek merkezden yönetilir.
+//  NOT: index.html içindeki meta etiketleri ve JSON-LD şemaları
+//  statiktir; buradaki bir bilgiyi değiştirirseniz index.html'i
+//  de güncelleyin (telefon, adres, SSS metinleri).
 // ============================================================
 
 export const SITE_CONFIG = {
   // ─── İşletme Bilgileri ───────────────────────────────────
   BUSINESS_NAME: 'Yunus Auto Garage',
-  PHONE_DIGITS: '5XXXXXXXXX',        // Başında 0 veya +90 olmadan
-  WHATSAPP_DIGITS: '5XXXXXXXXX',     // Başında 0 veya +90 olmadan
+  PHONE_DIGITS: '5362392968', // Başında 0 veya +90 olmadan
+  PHONE_DISPLAY: '0536 239 29 68',
+  WHATSAPP_DIGITS: '5362392968', // Başında 0 veya +90 olmadan
 
   // ─── Adres ───────────────────────────────────────────────
-  STREET_ADDRESS: 'Aksaray Sanayi Sitesi, X. Blok No: Y',
+  STREET_ADDRESS: 'Bahçesaray Mah., 8630. Sk. (Sanayi K13), Merkez',
   POSTAL_CODE: '68100',
   CITY: 'Aksaray',
   REGION: 'Aksaray',
   COUNTRY_CODE: 'TR',
 
-  // ─── Koordinatlar (Google Maps'ten kopyala) ──────────────
+  // ─── Harita sorgusu (embed ve yol tarifi bu adresle açılır) ─
+  // Hassas koordinat yerine adres sorgusu kullanılıyor; Google
+  // Business Profile açıldıktan sonra istenirse işletme adıyla
+  // güncellenebilir.
+  MAPS_QUERY: 'Bahçesaray, 8630. Sk., 68100 Aksaray Merkez/Aksaray',
+
+  // ─── Koordinatlar (yaklaşık — Google Maps'ten hassasını girin) ─
   LAT: '38.3713',
   LNG: '34.0212',
 
-  // ─── Harita Embed URL (Google Maps > Paylaş > Yerleştir) ─
-  GOOGLE_MAPS_EMBED_URL:
-    'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d...BURAYA_GERCEK_EMBED_URL_GIRIN',
-
   // ─── Site URL (yayınlanacak domain) ──────────────────────
-  SITE_URL: 'https://aksarayotoelektrik.com',
+  SITE_URL: 'https://yunusautogarage.com',
 
   // ─── Çalışma Saatleri ────────────────────────────────────
   OPENING_HOURS_DISPLAY: 'Pzt–Cmt: 08:30–19:00',
@@ -34,35 +39,39 @@ export const SITE_CONFIG = {
   SCHEMA_OPENS: '08:30',
   SCHEMA_CLOSES: '19:00',
 
-  // ─── Sosyal Medya & Profil ────────────────────────────────
-  GOOGLE_BUSINESS_PROFILE_URL: 'https://g.page/BURAYA_GBP_LINKI',
-  INSTAGRAM_URL: 'https://instagram.com/BURAYA_INSTAGRAM',
-  FACEBOOK_URL: 'https://facebook.com/BURAYA_FACEBOOK',
+  // ─── Sosyal Medya & Profil (hazır olunca doldurun) ────────
+  // Örn: 'https://g.page/r/XXXX', 'https://instagram.com/hesap'
+  GOOGLE_BUSINESS_PROFILE_URL: '',
+  INSTAGRAM_URL: '',
+  FACEBOOK_URL: '',
 
   // ─── Görseller ───────────────────────────────────────────
-  LOGO_OR_PHOTO_URL: 'https://aksarayotoelektrik.com/assets/logo.webp',
+  LOGO_OR_PHOTO_URL: 'https://yunusautogarage.com/assets/logo.png',
 
   // ─── Hizmetler ───────────────────────────────────────────
   SERVICES: [
     {
       icon: '🔋',
       title: 'Akü Değişimi ve Şarj',
-      description: 'Her marka araç akü testi, değişimi ve şarj hizmeti.',
+      description:
+        'Her marka araç için akü testi, akü değişimi, şarj ve yerinde akü takviyesi hizmeti.',
     },
     {
       icon: '⚙️',
       title: 'Marş & Alternatör Tamiri',
-      description: 'Marş motoru ve dinamo arıza tespiti, onarım ve değişimi.',
+      description:
+        'Marş motoru ve alternatör (dinamo/şarj dinamosu) arıza tespiti, onarım ve değişimi.',
     },
     {
       icon: '🔍',
       title: 'Arıza Tespiti / OBD Diagnostik',
-      description: 'Bilgisayarlı arıza okuma, motor ve elektronik sorun tespiti.',
+      description:
+        'Bilgisayarlı arıza okuma; motor, ABS, airbag ve elektronik sistem sorunlarının tespiti.',
     },
     {
       icon: '💡',
       title: 'Aydınlatma Sistemleri',
-      description: 'Far, sinyal, stop lambası ve iç aydınlatma onarımı.',
+      description: 'Far, sinyal, stop lambası ve iç aydınlatma arızalarının onarımı, far ayarı.',
     },
     {
       icon: '🔑',
@@ -72,22 +81,58 @@ export const SITE_CONFIG = {
     {
       icon: '🔌',
       title: 'Araç Kablo Tesisatı',
-      description: 'Elektrik tesisatı arızaları, kısa devre tespiti ve onarımı.',
+      description: 'Elektrik tesisatı arızaları, kısa devre tespiti, kablo yenileme ve onarımı.',
     },
     {
       icon: '❄️',
       title: 'Klima Elektroniği',
-      description: 'Klima elektronik arıza tespiti ve kontrol ünitesi onarımı.',
+      description: 'Araç kliması elektronik arıza tespiti ve klima kontrol ünitesi onarımı.',
     },
     {
       icon: '🛠️',
       title: 'Diğer Elektronik Aksam',
-      description: 'Sensör, ECU ve diğer elektronik birim tamir ve değişimi.',
+      description: 'Sensör, beyin (ECU), cam otomatiği ve diğer elektronik birimlerin tamiri.',
+    },
+  ],
+
+  // ─── Sık Sorulan Sorular ─────────────────────────────────
+  // NOT: index.html içindeki FAQPage JSON-LD şeması bu listeyle
+  // birebir aynı olmalıdır (Google zengin sonuç şartı).
+  FAQ: [
+    {
+      question: "Aksaray'da oto elektrikçi arıyorum, dükkanınız nerede?",
+      answer:
+        "Dükkanımız Aksaray oto sanayide, Bahçesaray Mahallesi 8630. Sokak'tadır — sanayide K13 olarak bilinir. Sayfadaki 'Yol Tarifi Al' butonuyla Google Maps üzerinden doğrudan yol tarifi alabilirsiniz.",
+    },
+    {
+      question: 'Aracım yolda kaldı, yerinde müdahale yapıyor musunuz?',
+      answer:
+        'Evet. Aksaray merkez ve çevresinde yolda kalan araçlara yerinde müdahale ediyoruz. Akü takviyesi, marş ve elektrik arızaları için hemen arayın: 0536 239 29 68.',
+    },
+    {
+      question: 'Hangi marka araçlara bakıyorsunuz?',
+      answer:
+        'Yerli ve yabancı tüm marka ve model araçlara oto elektrik hizmeti veriyoruz — binek, ticari ve hafif ticari araçlar dahil.',
+    },
+    {
+      question: 'Akü değişimi ne kadar sürer?',
+      answer:
+        'Akü testi ve değişimi çoğu araçta 15–30 dakika içinde tamamlanır. Aracınıza uygun aküyü aynı gün temin edip takıyoruz.',
+    },
+    {
+      question: 'Bilgisayarlı arıza tespiti (OBD diagnostik) yapıyor musunuz?',
+      answer:
+        'Evet. Bilgisayarlı OBD diagnostik cihazlarımızla motor, ABS, airbag ve elektronik sistem arızalarını doğru şekilde tespit ediyoruz; gereksiz parça masrafını önlüyoruz.',
+    },
+    {
+      question: 'Çalışma saatleriniz nedir?',
+      answer:
+        'Pazartesi–Cumartesi 08:30–19:00 arası açığız, Pazar günleri kapalıyız. Acil yol yardım için telefonla her zaman ulaşabilirsiniz.',
     },
   ],
 
   // ─── SEO Metinleri ───────────────────────────────────────
   META_TITLE: 'Yunus Auto Garage — Aksaray Oto Elektrikçi | 68 Sanayi Oto Elektrik',
   META_DESCRIPTION:
-    'Aksaray sanayi sitesinde oto elektrikçi. Akü, marş, alternatör, arıza tespiti. Yolda kaldınız mı? Hemen arayın: 05XX XXX XX XX.',
+    'Aksaray oto sanayide oto elektrikçi (Sanayi K13). Akü, marş, alternatör, bilgisayarlı arıza tespiti. Yolda kaldınız mı? Hemen arayın: 0536 239 29 68.',
 } as const;

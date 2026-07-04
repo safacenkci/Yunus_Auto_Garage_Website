@@ -1,59 +1,75 @@
-# YunusOtoElektrik
+# Yunus Auto Garage — Aksaray Oto Elektrik
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.2.16.
+Aksaray oto sanayide (Bahçesaray Mah., 8630. Sk. — Sanayi K13) hizmet veren oto elektrikçi
+**Yunus Auto Garage** için SEO odaklı, tek sayfalık tanıtım sitesi.
 
-## Development server
+- **Teknoloji:** Angular 21 + SSG (prerender) — sayfa, build sırasında statik HTML'e dönüştürülür,
+  Google içeriği doğrudan okur.
+- **Amaç:** "aksaray oto elektrik", "aksaray oto elektrikçi" gibi aramalarda üst sırada çıkmak;
+  ziyaretçinin tek dokunuşla **telefon**, **WhatsApp** ve **yol tarifine** ulaşması.
+- **Yayın:** GitHub Pages (`.github/workflows/deploy.yml` — `main` dalına push'ta otomatik deploy).
 
-To start a local development server, run:
-
-```bash
-ng serve
-```
-
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
-
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+## Geliştirme
 
 ```bash
-ng generate component component-name
+npm install
+npm start          # http://localhost:4200
+npm run build      # statik çıktı: dist/yunus-oto-elektrik/browser
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+İşletme bilgileri tek merkezden yönetilir: **`src/app/site-config.ts`**.
+Telefon, adres veya SSS metni değiştirirseniz `src/index.html` içindeki meta etiketleri ve
+JSON-LD şemalarını da aynı şekilde güncelleyin (ikisi birbirinden bağımsız statik içeriktir).
 
-```bash
-ng generate --help
-```
+---
 
-## Building
+## 🚀 Yayına Alma Rehberi (sırasıyla yapın)
 
-To build the project run:
+Sitenin Google'da çıkması için kod tek başına yetmez; aşağıdaki adımlar tamamlanmalıdır.
 
-```bash
-ng build
-```
+### 1. Domain'i satın alın: `yunusautogarage.com`
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+Herhangi bir kayıt firmasından (ör. isimtescil, GoDaddy, Namecheap) alınabilir.
 
-## Running unit tests
+### 2. GitHub Pages'i etkinleştirin
 
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
+1. GitHub'da repo → **Settings → Pages**
+2. **Source:** "GitHub Actions" seçin.
+3. `main` dalına push yapıldığında site otomatik yayınlanır
+   (ilk aşamada `https://safacenkci.github.io/Yunus_Auto_Garage_Website/` adresinde görünür;
+   site `base href /` ile derlendiği için asıl doğru çalışma **özel domain bağlandıktan sonra** olur).
 
-```bash
-ng test
-```
+### 3. Domain'i GitHub Pages'e bağlayın
 
-## Running end-to-end tests
+1. Domain firmanızın DNS panelinde şu kayıtları ekleyin:
+   - `A` kaydı → `185.199.108.153`, `185.199.109.153`, `185.199.110.153`, `185.199.111.153`
+   - `CNAME` kaydı: `www` → `safacenkci.github.io`
+2. GitHub → **Settings → Pages → Custom domain** alanına `yunusautogarage.com` yazın,
+   **Enforce HTTPS**'i işaretleyin (sertifika birkaç saat içinde hazır olur).
 
-For end-to-end (e2e) testing, run:
+### 4. Google Business Profile açın — **yerel SEO'daki en önemli adım!**
 
-```bash
-ng e2e
-```
+"aksaray oto elektrik" aramalarında **harita kutusunda (yerel pakette)** çıkmayı sağlayan şey
+web sitesi değil, Google Business Profile'dır:
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+1. https://business.google.com adresinden **Yunus Auto Garage** işletmesini ekleyin.
+2. Kategori: **Oto elektrik servisi / Oto tamirhanesi**; adres, telefon (0536 239 29 68),
+   çalışma saatleri ve web sitesi (`https://yunusautogarage.com`) bilgilerini **sitedekiyle birebir aynı** girin
+   (tutarlılık sıralamayı doğrudan etkiler).
+3. Doğrulama sonrası dükkan fotoğrafları yükleyin ve **müşterilerden Google yorumu isteyin** —
+   yorum sayısı ve puanı yerel sıralamada en güçlü sinyallerdendir.
 
-## Additional Resources
+### 5. Google Search Console'a ekleyin
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+1. https://search.google.com/search-console → `yunusautogarage.com` alan adını ekleyin (DNS doğrulaması).
+2. **Sitemaps** bölümüne `https://yunusautogarage.com/sitemap.xml` gönderin.
+3. Birkaç gün içinde site dizine alınır; "URL inceleme" aracıyla durumu takip edebilirsiniz.
+
+### 6. Kalan küçük güncellemeler
+
+- **Hassas GPS koordinatı:** Google Maps'te dükkana sağ tıklayıp koordinatı kopyalayın;
+  `src/app/site-config.ts` (`LAT`/`LNG`) ve `src/index.html` (JSON-LD `geo`) alanlarını güncelleyin.
+- **Sosyal profiller:** Google Business Profile / Instagram / Facebook linkleri hazır olunca
+  `site-config.ts` içindeki boş alanlara ekleyin ve `index.html` JSON-LD'sine `sameAs` olarak girin.
+- **Gerçek fotoğraflar:** `public/assets/` içindeki üretilmiş logo/og-image yerine dükkanın gerçek
+  fotoğraflarını koymak hem SEO'ya hem güvene katkı sağlar.

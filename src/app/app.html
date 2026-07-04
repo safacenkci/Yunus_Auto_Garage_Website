@@ -13,6 +13,7 @@
       </div>
     </div>
     <nav class="header-cta" aria-label="İletişim">
+      <a href="#sss" class="header-link">SSS</a>
       <a [href]="phoneHref" class="btn btn-call" aria-label="Hemen ara">
         <span class="btn-icon" aria-hidden="true">📞</span>
         <span>Ara</span>
@@ -38,7 +39,7 @@
       <span class="hero-sub-title">68 Aksaray Oto Elektrikçi</span>
     </h1>
     <p class="hero-lead">
-      Aksaray sanayi sitesinde hızlı arıza tespiti ve onarım.
+      Aksaray oto sanayide (Sanayi K13) hızlı arıza tespiti ve onarım.
       Yolda kaldınız mı? <strong>Hemen ulaşın, yerinize geliyoruz.</strong>
     </p>
     <div class="hero-cta">
@@ -59,7 +60,8 @@
     <div class="about-content">
       <div class="about-text">
         <p>
-          <strong>Yunus Auto Garage</strong> olarak Aksaray sanayi sitesinde yılların tecrübesiyle
+          <strong>Yunus Auto Garage</strong> olarak Aksaray oto sanayide — Bahçesaray Mahallesi
+          8630. Sokak, sanayide bilinen adıyla <strong>K13</strong> — yılların tecrübesiyle
           oto elektrik hizmeti sunuyoruz. Her marka ve model araca bilgisayarlı diagnostik,
           arıza tespiti ve onarım yapıyoruz.
         </p>
@@ -147,7 +149,7 @@
           </div>
           <div class="address-line">
             <span aria-hidden="true">📞</span>
-            <a [href]="phoneHref">0{{ config.PHONE_DIGITS }}</a>
+            <a [href]="phoneHref">{{ config.PHONE_DISPLAY }}</a>
           </div>
           <div class="address-line">
             <span aria-hidden="true">🕐</span>
@@ -216,8 +218,24 @@
     </table>
     <p class="hours-note">
       ⚡ <strong>Acil yol yardım</strong> için her zaman arayabilirsiniz —
-      <a [href]="phoneHref">0{{ config.PHONE_DIGITS }}</a>
+      <a [href]="phoneHref">{{ config.PHONE_DISPLAY }}</a>
     </p>
+  </div>
+</section>
+
+<!-- ─── SIK SORULAN SORULAR ──────────────────────────────────────── -->
+<section class="faq section" id="sss" aria-labelledby="faq-title">
+  <div class="container">
+    <h2 id="faq-title">Sık Sorulan Sorular</h2>
+    <p class="section-lead">Aksaray oto elektrik hizmetlerimizle ilgili merak edilenler</p>
+    <div class="faq-list">
+      @for (item of config.FAQ; track item.question) {
+        <details class="faq-item">
+          <summary class="faq-question">{{ item.question }}</summary>
+          <p class="faq-answer">{{ item.answer }}</p>
+        </details>
+      }
+    </div>
   </div>
 </section>
 
@@ -229,13 +247,13 @@
       <a [href]="phoneHref" class="contact-card" aria-label="Telefon ile ara">
         <span class="contact-icon" aria-hidden="true">📞</span>
         <span class="contact-label">Telefon</span>
-        <span class="contact-value">0{{ config.PHONE_DIGITS }}</span>
+        <span class="contact-value">{{ config.PHONE_DISPLAY }}</span>
         <span class="contact-action btn btn-call">Hemen Ara</span>
       </a>
       <a [href]="whatsappHref" class="contact-card" aria-label="WhatsApp ile yaz" target="_blank" rel="noopener">
         <span class="contact-icon" aria-hidden="true">💬</span>
         <span class="contact-label">WhatsApp</span>
-        <span class="contact-value">0{{ config.WHATSAPP_DIGITS }}</span>
+        <span class="contact-value">{{ config.PHONE_DISPLAY }}</span>
         <span class="contact-action btn btn-whatsapp">Mesaj Gönder</span>
       </a>
       <div class="contact-card contact-card--address">
@@ -265,7 +283,7 @@
       <address class="footer-contact">
         <div>{{ config.STREET_ADDRESS }}</div>
         <div>{{ config.CITY }} / {{ config.REGION }}</div>
-        <a [href]="phoneHref">0{{ config.PHONE_DIGITS }}</a>
+        <a [href]="phoneHref">{{ config.PHONE_DISPLAY }}</a>
       </address>
       <div class="footer-area">
         <strong>Hizmet Bölgesi</strong>
