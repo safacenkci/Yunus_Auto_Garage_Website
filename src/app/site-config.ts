@@ -1,19 +1,20 @@
 // ============================================================
 //  SITE KONFİGÜRASYON DOSYASI
 //  Gerçek verileri aşağıdaki alanlara girin.
-//  Tüm {{PLACEHOLDER}} ifadeleri index.html içinde de mevcuttur.
 // ============================================================
 
 export const SITE_CONFIG = {
   // ─── İşletme Bilgileri ───────────────────────────────────
   BUSINESS_NAME: 'Yunus Auto Garage',
-  PHONE_DIGITS: '5XXXXXXXXX',        // Başında 0 veya +90 olmadan
-  WHATSAPP_DIGITS: '5XXXXXXXXX',     // Başında 0 veya +90 olmadan
+  PHONE_DIGITS: '5320000000',
+  PHONE_DISPLAY: '0532 000 00 00',
+  PHONE_LANDLINE: '0382 000 00 00',
+  WHATSAPP_DIGITS: '5320000000',
 
   // ─── Adres ───────────────────────────────────────────────
-  STREET_ADDRESS: 'Aksaray Sanayi Sitesi, X. Blok No: Y',
+  STREET_ADDRESS: 'Yeni Sanayi Sitesi, 1. Blok No:42',
   POSTAL_CODE: '68100',
-  CITY: 'Aksaray',
+  CITY: 'Merkez',
   REGION: 'Aksaray',
   COUNTRY_CODE: 'TR',
 
@@ -29,10 +30,10 @@ export const SITE_CONFIG = {
   SITE_URL: 'https://aksarayotoelektrik.com',
 
   // ─── Çalışma Saatleri ────────────────────────────────────
-  OPENING_HOURS_DISPLAY: 'Pzt–Cmt: 08:30–19:00',
+  OPENING_HOURS_DISPLAY: 'Pzt - Cmt: 08:30 - 18:30',
   OPENING_HOURS_SUNDAY: 'Pazar: Kapalı',
   SCHEMA_OPENS: '08:30',
-  SCHEMA_CLOSES: '19:00',
+  SCHEMA_CLOSES: '18:30',
 
   // ─── Sosyal Medya & Profil ────────────────────────────────
   GOOGLE_BUSINESS_PROFILE_URL: 'https://g.page/BURAYA_GBP_LINKI',
@@ -41,53 +42,45 @@ export const SITE_CONFIG = {
 
   // ─── Görseller ───────────────────────────────────────────
   LOGO_OR_PHOTO_URL: 'https://aksarayotoelektrik.com/assets/logo.webp',
+  HERO_IMAGE_URL:
+    'https://lh3.googleusercontent.com/aida-public/AB6AXuChWO-48-RaW8Z0jJlf_ZEq4Ww5JPvPtUCYxBHjQwdvqUQr38gZLkhJUvrJa-8a72sPVw_thQK3K54rebPjEBUwpdY-8rGqTV0sGM__YCvbnDer7ItgsiRm6GPsEGgoCe3qMe7EVaZqXw6GMDWZBcEtTAjNuSZm-8gkxwdYxJm3anEQqZhUzZCcUrRz0CZROawYWqXao2QWvkxbj9dU6bS3vVV8MhLEdz18HGGNvBEE9hhMZUZD-RQ8-TQuYKzAzpPKTHNvLS96WJA',
+  ABOUT_IMAGE_URL:
+    'https://lh3.googleusercontent.com/aida-public/AB6AXuD1g4-xMa5gEXQw-ypO8yRVyFZAMN34E40QmNp-Kx0e7NzLJHH1YQv2JVVECj7fbfckgMae0r45OzeA602iz3mcsGb6ZskSY_n1RpQReMMZCZiCkpspP3uJN2kW0hms1zGHVHUzMxlsb_yLmln9ybNqO_5T9z9zEJBOExBzXKCd78jh5brV9V_DYKaUnILwWNJvDshxOViDHGXu42tLUdzOeBbf6oStSEFELYBHNA1swXN-84OZ-cH9vIvH1mXBbBNOvJGhfAlM8fg',
 
   // ─── Hizmetler ───────────────────────────────────────────
   SERVICES: [
     {
-      icon: '🔋',
-      title: 'Akü Değişimi ve Şarj',
-      description: 'Her marka araç akü testi, değişimi ve şarj hizmeti.',
+      icon: 'build',
+      title: 'Motor Revizyonu',
+      description:
+        'Performans kaybı yaşayan motorlarınızı fabrika ayarlarına döndürüyoruz. Tam kapsamlı analiz ve onarım.',
     },
     {
-      icon: '⚙️',
-      title: 'Marş & Alternatör Tamiri',
-      description: 'Marş motoru ve dinamo arıza tespiti, onarım ve değişimi.',
+      icon: 'electric_car',
+      title: 'Elektronik Arıza',
+      description:
+        'Modern araçların karmaşık elektronik sistemlerini bilgisayarlı diagnostik cihazlarla noktasal tespit edip çözüyoruz.',
     },
     {
-      icon: '🔍',
-      title: 'Arıza Tespiti / OBD Diagnostik',
-      description: 'Bilgisayarlı arıza okuma, motor ve elektronik sorun tespiti.',
+      icon: 'oil_barrel',
+      title: 'Periyodik Bakım',
+      description:
+        'Yağ değişimi, filtre kontrolü ve genel check-up ile aracınızın ömrünü uzatıyor, güvenliğinizi sağlıyoruz.',
     },
     {
-      icon: '💡',
-      title: 'Aydınlatma Sistemleri',
-      description: 'Far, sinyal, stop lambası ve iç aydınlatma onarımı.',
-    },
-    {
-      icon: '🔑',
-      title: 'Immobilizer & Anahtar/Yazılım',
-      description: 'Araç güvenlik sistemi, immobilizer ve anahtar yazılım hizmetleri.',
-    },
-    {
-      icon: '🔌',
-      title: 'Araç Kablo Tesisatı',
-      description: 'Elektrik tesisatı arızaları, kısa devre tespiti ve onarımı.',
-    },
-    {
-      icon: '❄️',
-      title: 'Klima Elektroniği',
-      description: 'Klima elektronik arıza tespiti ve kontrol ünitesi onarımı.',
-    },
-    {
-      icon: '🛠️',
-      title: 'Diğer Elektronik Aksam',
-      description: 'Sensör, ECU ve diğer elektronik birim tamir ve değişimi.',
+      icon: 'tire_repair',
+      title: 'Alt Takım & Fren',
+      description:
+        'Sürüş güvenliğiniz için kritik olan fren sistemleri ve yürüyen aksam kontrollerini titizlikle gerçekleştiriyoruz.',
     },
   ],
 
+  // ─── Hakkımızda ──────────────────────────────────────────
+  ABOUT_HIGHLIGHTS: ['20 Yıllık Tecrübe', 'Garantili İşçilik', 'Şeffaf Fiyatlandırma'],
+
   // ─── SEO Metinleri ───────────────────────────────────────
-  META_TITLE: 'Yunus Auto Garage — Aksaray Oto Elektrikçi | 68 Sanayi Oto Elektrik',
+  META_TITLE: 'Yunus Auto Garage | Modern Automotive Service',
   META_DESCRIPTION:
     'Aksaray sanayi sitesinde oto elektrikçi. Akü, marş, alternatör, arıza tespiti. Yolda kaldınız mı? Hemen arayın: 05XX XXX XX XX.',
+  FOOTER_TAGLINE: 'Modern Mühendislik, Profesyonel Hizmet.',
 } as const;

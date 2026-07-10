@@ -21,8 +21,17 @@ export class App {
   );
 
   readonly mapLoaded = signal(false);
+  readonly mobileMenuOpen = signal(false);
 
   loadMap() {
     this.mapLoaded.set(true);
+  }
+
+  toggleMobileMenu() {
+    this.mobileMenuOpen.update((open) => !open);
+  }
+
+  closeMobileMenu() {
+    this.mobileMenuOpen.set(false);
   }
 }
