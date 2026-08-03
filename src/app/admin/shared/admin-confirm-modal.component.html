@@ -1,0 +1,35 @@
+@if (open()) {
+  <div class="admin-modal-backdrop" role="presentation">
+    <div
+      class="admin-modal relative"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="admin-confirm-title"
+      (click)="$event.stopPropagation()"
+    >
+      <button
+        type="button"
+        (click)="onCancel()"
+        class="absolute top-3 right-3 p-1 rounded-md text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors"
+        aria-label="Kapat"
+      >
+        <span class="material-symbols-outlined text-xl leading-none">close</span>
+      </button>
+      <p id="admin-confirm-title" class="font-body-md font-bold mb-sm pr-8">{{ resolvedTitle() }}</p>
+      @if (description()) {
+        <p class="font-label-sm text-on-surface-variant mb-md">{{ description() }}</p>
+      }
+      <div class="flex flex-wrap gap-md justify-end">
+        <button type="button" (click)="onCancel()" [disabled]="loading()" class="admin-btn admin-btn--outline">Vazgeç</button>
+        <button type="button" (click)="onConfirm()" [disabled]="loading()" [class]="confirmButtonClass()">
+          @if (loading()) {
+            <app-admin-button-spinner [variant]="spinnerVariant()" />
+            İşleniyor…
+          } @else {
+            {{ confirmLabel() }}
+          }
+        </button>
+      </div>
+    </div>
+  </div>
+}

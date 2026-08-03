@@ -1,0 +1,30 @@
+<footer
+  class="bg-surface-container-lowest dark:bg-surface-container w-full rounded-t-xl border-t border-outline-variant mt-auto"
+  role="contentinfo"
+>
+  <div class="page-container flex flex-col md:flex-row justify-between items-center py-lg md:py-xl gap-md">
+    <div class="font-headline-md text-headline-md font-bold text-primary">
+      {{ config.BUSINESS_NAME }}
+    </div>
+    <div class="font-label-md text-label-md text-on-surface-variant text-center md:text-left">
+      &copy; {{ currentYear }} {{ config.BUSINESS_NAME }}. {{ config.FOOTER_TAGLINE }}
+    </div>
+    <div class="flex flex-wrap justify-center gap-md font-label-md text-label-md text-on-surface-variant">
+      @for (section of navSections; track section.id) {
+        <a
+          class="hover:underline hover:text-primary transition-all touch-target inline-flex items-center"
+          [href]="'/#' + section.id"
+          (click)="navigateToSection($event, section.id)"
+        >
+          {{ section.label }}
+        </a>
+      }
+      <a
+        class="hover:underline hover:text-primary transition-all touch-target inline-flex items-center"
+        routerLink="/randevu"
+      >
+        Randevu Al
+      </a>
+    </div>
+  </div>
+</footer>

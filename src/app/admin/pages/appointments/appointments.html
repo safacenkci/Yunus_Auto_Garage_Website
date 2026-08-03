@@ -1,0 +1,94 @@
+<h1 class="admin-page-title">Randevular</h1>
+
+<div class="admin-section flex flex-wrap gap-md">
+  @for (s of ['', 'Pending', 'Confirmed', 'Completed', 'Cancelled']; track s) {
+    <button
+      type="button"
+      class="admin-chip"
+      [class.admin-chip--active]="statusFilter() === s"
+      (click)="setStatusFilter(s)"
+    >
+      @if (s === '') { Tümü } @else { {{ statusLabel(s) }} }
+    </button>
+  }
+</div>
+
+<div class="hidden md:block overflow-x-auto admin-section">
+  <table class="admin-table">
+    <thead class="admin-table-head">
+      <tr>
+        <th>Müşteri</th>
+        <th>Telefon</th>
+        <th>Araç</th>
+        <th>Hizmet</th>
+        <th>Detay</th>
+        <th>Tarih/Saat</th>
+        <th>Durum</th>
+        <th>İşlem</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (apt of appointments(); track apt.id) {
+        <tr>
+          <td>{{ apt.fullName }}</td>
+          <td><a [href]="'tel:+90' + apt.phone" class="hover:text-primary">{{ apt.phone }}</a></td>
+          <td>{{ apt.vehicleMake }} {{ apt.vehicleModel }}</td>
+          <td>{{ apt.serviceName }}</td>
+          <td class="max-w-xs truncate" [title]="apt.note ?? ''">{{ apt.note ?? '—' }}</td>
+          <td>{{ apt.date }} {{ apt.timeSlot }}</td>
+          <td><span class="admin-badge" [class]="statusClass(apt.status)">{{ statusLabel(apt.status) }}</span></td>
+          <td>
+            <div class="flex flex-wrap gap-xs">
+              @if (apt.status === 'Pending') {
+                <button type="button" (click)="askApprove(apt.id)" class="admin-btn admin-btn--secondary admin-btn--sm">Onayla</button>
+                <button type="button" (click)="askReject(apt.id)" class="admin-btn admin-btn--danger admin-btn--sm">Reddet</button>
+              }
+              @if (apt.status === 'Confirmed') {
+                <button type="button" (click)="askStatusChange(apt.id, 'Completed', 'Tamamlandı', 'secondary')" class="admin-btn admin-btn--outline admin-btn--sm">Tamamlandı</button>
+                <button type="button" (click)="askStatusChange(apt.id, 'NoShow', 'Gelmedi', 'danger')" class="admin-btn admin-btn--danger admin-btn--sm">Gelmedi</button>
+              }
+            </div>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</div>
+
+<div class="md:hidden grid grid-cols-1 sm:grid-cols-2 gap-md admin-section">
+  @for (apt of appointments(); track apt.id) {
+    <div class="admin-card">
+      <p class="font-body-md font-bold">{{ apt.fullName }}</p>
+      <p class="font-label-sm"><a [href]="'tel:+90' + apt.phone">{{ apt.phone }}</a></p>
+      <p class="font-label-sm">{{ apt.vehicleMake }} {{ apt.vehicleModel }}</p>
+      <p class="font-label-sm">{{ apt.serviceName }} — {{ apt.date }} {{ apt.timeSlot }}</p>
+      @if (apt.note) {
+        <p class="font-label-sm text-on-surface-variant mt-xs">{{ apt.note }}</p>
+      }
+      <span class="admin-badge mt-xs" [class]="statusClass(apt.status)">{{ statusLabel(apt.status) }}</span>
+      <div class="flex flex-wrap gap-xs mt-sm">
+        @if (apt.status === 'Pending') {
+          <button type="button" (click)="askApprove(apt.id)" class="admin-btn admin-btn--secondary admin-btn--sm">Onayla</button>
+          <button type="button" (click)="askReject(apt.id)" class="admin-btn admin-btn--danger admin-btn--sm">Reddet</button>
+        }
+        @if (apt.status === 'Confirmed') {
+          <button type="button" (click)="askStatusChange(apt.id, 'Completed', 'Tamamlandı', 'secondary')" class="admin-btn admin-btn--outline admin-btn--sm">Tamamlandı</button>
+          <button type="button" (click)="askStatusChange(apt.id, 'NoShow', 'Gelmedi', 'danger')" class="admin-btn admin-btn--danger admin-btn--sm">Gelmedi</button>
+        }
+      </div>
+    </div>
+  }
+</div>
+
+@if (pendingConfirm(); as confirm) {
+  <app-admin-confirm-modal
+    [open]="true"
+    [kind]="confirm.kind"
+    [description]="confirm.description"
+    [confirmLabel]="confirm.confirmLabel"
+    [confirmVariant]="confirm.confirmVariant"
+    [loading]="confirming()"
+    (cancelled)="closeConfirm()"
+    (confirmed)="submitConfirm()"
+  />
+}

@@ -1,0 +1,121 @@
+<header #headerRef class="fixed top-0 left-0 w-full z-50">
+  @if (promo(); as banner) {
+    <div
+      data-header-promo
+      class="bg-gradient-to-r from-secondary-container to-secondary-fixed-dim text-on-secondary-container text-center py-2 px-lg font-label-sm"
+    >
+      {{ banner.messageText }}
+      @if (banner.ctaText) {
+        @if (isInternalLink(banner.ctaLink)) {
+          <a
+            [routerLink]="banner.ctaLink || '/randevu'"
+            class="font-bold underline underline-offset-2 hover:no-underline touch-target inline-flex items-center"
+          >
+            {{ banner.ctaText }}
+          </a>
+        } @else {
+          <a
+            [href]="banner.ctaLink || '/randevu'"
+            class="font-bold underline underline-offset-2 hover:no-underline touch-target inline-flex items-center"
+          >
+            {{ banner.ctaText }}
+          </a>
+        }
+      }
+    </div>
+  }
+
+  <nav
+    class="bg-surface/80 dark:bg-inverse-surface/80 backdrop-blur-xl w-full border-b border-outline-variant/30 shadow-sm glass-nav"
+    aria-label="Ana menü"
+  >
+    <div data-header-nav class="page-container flex justify-between items-center h-16 md:h-20">
+      <div class="flex items-center gap-sm">
+        <a
+          class="font-headline-md text-headline-md font-bold tracking-tight text-primary dark:text-primary-fixed-dim"
+          routerLink="/"
+        >
+          {{ config.BUSINESS_NAME }}
+        </a>
+      </div>
+      <div class="hidden md:flex gap-lg items-center">
+        @for (section of navSections; track section.id) {
+          <a
+            class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors hover:bg-surface-container-low dark:hover:bg-surface-container-highest transition-all duration-300 px-md py-sm rounded-lg active:scale-95 transition-transform touch-target"
+            [href]="'/#' + section.id"
+            (click)="navigateToSection($event, section.id)"
+          >
+            {{ section.label }}
+          </a>
+        }
+      </div>
+      <div class="flex items-center gap-md">
+        <div class="hidden md:flex items-center gap-xs mr-sm">
+          <span class="font-headline-md text-body-lg font-bold text-primary">{{
+            config.PHONE_DISPLAY
+          }}</span>
+        </div>
+        <a
+          [href]="phoneHref"
+          class="hidden md:flex items-center justify-center touch-target rounded-full bg-surface-container-low hover:bg-surface-variant transition-colors text-primary active:scale-95 transition-transform"
+          aria-label="Telefon ile ara"
+        >
+          <span class="material-symbols-outlined filled-icon">call</span>
+        </a>
+        <a
+          [href]="whatsappHref"
+          class="hidden md:flex items-center justify-center touch-target rounded-full bg-surface-container-low hover:bg-surface-variant transition-colors text-primary active:scale-95 transition-transform"
+          aria-label="WhatsApp ile yaz"
+          target="_blank"
+          rel="noopener"
+        >
+          <span class="material-symbols-outlined filled-icon">chat</span>
+        </a>
+        <a
+          class="hidden md:flex items-center justify-center touch-target px-md py-sm bg-gradient-to-r from-secondary-container to-secondary-fixed-dim text-on-secondary-container font-label-md text-label-md rounded-lg hover:shadow-premium transition-all active:scale-95 transition-transform"
+          routerLink="/randevu"
+        >
+          Randevu Al
+        </a>
+        <button
+          class="md:hidden flex items-center justify-center touch-target text-primary"
+          type="button"
+          (click)="toggleMobileMenu()"
+          [attr.aria-expanded]="mobileMenuOpen()"
+          [attr.aria-label]="menuToggleLabel()"
+          aria-controls="mobile-menu"
+        >
+          <span class="material-symbols-outlined">{{ mobileMenuOpen() ? 'close' : 'menu' }}</span>
+        </button>
+      </div>
+    </div>
+
+    @if (mobileMenuOpen()) {
+      <div
+        id="mobile-menu"
+        class="md:hidden border-t border-outline-variant/30 bg-surface-container-lowest px-lg py-md flex flex-col gap-xs"
+      >
+        @for (section of navSections; track section.id) {
+          <a
+            class="font-body-md text-body-md text-on-surface-variant touch-target flex items-center"
+            [href]="'/#' + section.id"
+            (click)="navigateToSection($event, section.id)"
+          >
+            {{ section.label }}
+          </a>
+        }
+        <a [href]="phoneHref" class="font-body-md text-body-md text-primary font-bold touch-target flex items-center" (click)="closeMobileMenu()">{{ config.PHONE_DISPLAY }}</a>
+        <a [href]="whatsappHref" target="_blank" rel="noopener" class="flex items-center gap-xs font-body-md text-body-md text-primary touch-target" (click)="closeMobileMenu()">
+          <span class="material-symbols-outlined text-xl">chat</span> WhatsApp
+        </a>
+        <a
+          routerLink="/randevu"
+          class="flex items-center justify-center touch-target px-md py-sm bg-gradient-to-r from-secondary-container to-secondary-fixed-dim text-on-secondary-container font-label-md rounded-lg mt-xs"
+          (click)="closeMobileMenu()"
+        >
+          Randevu Al — %{{ config.PROMO_DISCOUNT_PERCENT }} İndirim
+        </a>
+      </div>
+    }
+  </nav>
+</header>

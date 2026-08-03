@@ -1,0 +1,401 @@
+    <!-- Hero Section -->
+    <section
+      class="page-container section-padding w-full flex flex-col md:flex-row items-center gap-2xl"
+      aria-labelledby="hero-title"
+    >
+      <div class="w-full md:w-1/2 flex flex-col gap-lg z-10">
+        <div class="flex flex-wrap gap-xs">
+          <div
+            class="inline-flex items-center gap-xs px-md py-xs bg-surface-container-low rounded-full w-max border border-outline-variant/30"
+          >
+            <span class="w-2 h-2 rounded-full bg-secondary-container animate-pulse"></span>
+            <span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest"
+              >Aksaray Sanayi Sitesi</span
+            >
+          </div>
+          <div
+            class="inline-flex items-center gap-xs px-md py-xs bg-secondary-container rounded-full w-max border border-secondary/30"
+          >
+            <span class="material-symbols-outlined text-base text-on-secondary-container">local_offer</span>
+            <span class="font-label-sm text-label-sm text-on-secondary-container font-bold uppercase tracking-widest"
+              >%{{ config.PROMO_DISCOUNT_PERCENT }} İndirim</span
+            >
+          </div>
+        </div>
+        <h1
+          id="hero-title"
+          class="font-headline-xl text-headline-fluid text-primary max-w-2xl leading-tight uppercase tracking-wide"
+        >
+          Yunus <span class="gradient-text">Auto Garage</span>
+        </h1>
+        <div class="flex flex-wrap gap-xs">
+          @for (tag of config.HERO_SERVICE_TAGS; track tag) {
+            <span
+              class="inline-flex items-center px-md py-xs bg-surface-container-low rounded-full border border-outline-variant/30 font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest"
+            >
+              {{ tag }}
+            </span>
+          }
+        </div>
+        <div
+          class="flex flex-wrap gap-xs pt-xs"
+          aria-label="Yerinde hizmet bilgileri"
+        >
+          @for (item of config.HERO_LOCATION_HIGHLIGHTS; track item.label) {
+            @if (item.emphasized) {
+              <span
+                class="inline-flex items-center gap-xs px-md py-xs bg-secondary-container/70 rounded-full border border-secondary/25 font-label-sm text-label-sm text-on-secondary-container uppercase tracking-widest"
+              >
+                <span class="material-symbols-outlined text-base">{{ item.icon }}</span>
+                {{ item.label }}
+              </span>
+            } @else {
+              <span
+                class="inline-flex items-center gap-xs px-md py-xs bg-surface-container-low rounded-full border border-outline-variant/30 font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest"
+              >
+                <span class="material-symbols-outlined text-base text-on-surface-variant/80">{{
+                  item.icon
+                }}</span>
+                {{ item.label }}
+              </span>
+            }
+          }
+        </div>
+        <div class="flex flex-col sm:flex-row gap-md pt-md">
+          <a
+            routerLink="/randevu"
+            class="btn-primary"
+            aria-label="Randevu al"
+          >
+            <span class="material-symbols-outlined">event</span>
+            Randevu Al — %{{ config.PROMO_DISCOUNT_PERCENT }} İndirim
+          </a>
+          <a
+            [href]="phoneHref"
+            class="btn-secondary"
+            aria-label="Acil arama"
+          >
+            <span class="material-symbols-outlined">call</span>
+            Acil Arama
+          </a>
+          <a
+            [href]="whatsappHref"
+            class="btn-secondary"
+            aria-label="WhatsApp'tan yaz"
+            target="_blank"
+            rel="noopener"
+          >
+            <span class="material-symbols-outlined">chat</span>
+            WhatsApp
+          </a>
+        </div>
+      </div>
+      <div class="w-full md:w-1/2 relative">
+        <div
+          class="absolute inset-0 bg-gradient-to-tr from-secondary-container/20 to-transparent rounded-3xl -z-10 blur-3xl transform translate-x-10 translate-y-10"
+        ></div>
+        <img
+          [src]="config.HERO_IMAGE_URL"
+          alt="Yunus Auto Garage dış görünüm"
+          class="w-full aspect-[4/3] md:aspect-[3/2] object-cover object-[center_70%] md:object-[center_75%] rounded-3xl shadow-premium border border-outline-variant/20"
+        />
+      </div>
+    </section>
+
+    <!-- Services Section (Ne İş Yapıyoruz?) -->
+    <section
+      class="page-container section-padding w-full bg-surface-bright rounded-3xl mt-lg mb-lg scroll-anchor"
+      id="hizmetler"
+      aria-labelledby="services-title"
+    >
+      <div class="text-center mb-2xl flex flex-col items-center gap-xs">
+        <span class="font-label-sm text-label-sm text-secondary tracking-widest uppercase"
+          >Uzmanlık Alanlarımız</span
+        >
+        <h2
+          id="services-title"
+          class="font-headline-lg text-headline-lg-fluid text-primary"
+        >
+          Ne İş Yapıyoruz?
+        </h2>
+        <p class="font-body-md text-body-md text-on-surface-variant prose-width mx-auto mt-xs">
+          En son teknoloji ekipmanlar ve uzman kadromuzla aracınız için tam kapsamlı çözümler.
+        </p>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-lg">
+        @for (service of config.SERVICES; track service.title) {
+          <article
+            class="bg-surface-container-lowest p-lg rounded-2xl border border-outline-variant/20 shadow-premium hover:-translate-y-1 transition-transform duration-300 flex flex-col gap-md group"
+          >
+            <div
+              class="w-12 h-12 rounded-xl bg-surface-container-low flex items-center justify-center text-primary group-hover:bg-secondary-container/20 group-hover:text-secondary-container transition-colors"
+            >
+              <span class="material-symbols-outlined text-2xl">{{ service.icon }}</span>
+            </div>
+            <h3 class="font-headline-md text-headline-sm text-primary">
+              {{ service.title }}
+            </h3>
+            <p class="font-body-md text-label-md text-on-surface-variant">{{ service.description }}</p>
+            @if (serviceTags(service).length) {
+              <div class="flex flex-wrap gap-xs">
+                @for (tag of serviceTags(service); track tag) {
+                  <span
+                    class="inline-flex items-center px-sm py-xs bg-surface-container-low rounded-full border border-outline-variant/30 font-label-sm text-label-sm text-on-surface-variant"
+                  >
+                    {{ tag }}
+                  </span>
+                }
+              </div>
+            }
+          </article>
+        }
+      </div>
+    </section>
+
+    <!-- About Section -->
+    <section
+      class="page-container section-padding w-full scroll-anchor"
+      id="hakkimizda"
+      aria-labelledby="about-title"
+    >
+      <div class="flex flex-col md:flex-row items-center gap-2xl">
+        <div class="w-full md:w-1/2 relative">
+          <img
+            [src]="config.ABOUT_IMAGE_URL"
+            alt="Yunus Auto Garage iç mekan"
+            class="w-full aspect-[4/3] object-cover rounded-3xl shadow-premium border border-outline-variant/20"
+          />
+        </div>
+        <div class="w-full md:w-1/2 flex flex-col gap-md">
+          <span class="font-label-sm text-label-sm text-secondary tracking-widest uppercase"
+            >Hakkımızda</span
+          >
+          <h2
+            id="about-title"
+            class="font-headline-xl text-headline-lg-fluid text-primary"
+          >
+            Usta Ellerde Güvendesiniz.
+          </h2>
+          <p class="font-body-lg text-body-lg text-on-surface-variant mb-md">
+            Sanayinin tozunu yutmuş, ama teknolojinin hızına yetişmiş bir ekibiz. Aracınızın
+            dilinden anlıyor, gereksiz parça değişimi değil, nokta atışı çözüm sunuyoruz.
+          </p>
+          <ul class="flex flex-col gap-md">
+            @for (highlight of config.ABOUT_HIGHLIGHTS; track highlight) {
+              <li class="flex items-center gap-md">
+                <div
+                  class="w-8 h-8 rounded-full bg-secondary-container/20 flex items-center justify-center text-secondary-container flex-shrink-0"
+                >
+                  <span class="material-symbols-outlined text-lg">check_circle</span>
+                </div>
+                <span class="font-body-md text-body-md text-on-surface-variant">{{ highlight }}</span>
+              </li>
+            }
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- Gallery Section -->
+    <section
+      class="page-container section-padding w-full bg-surface-bright rounded-3xl mt-lg mb-lg scroll-anchor"
+      id="galeri"
+      aria-labelledby="gallery-title"
+    >
+      <div class="text-center mb-2xl flex flex-col items-center gap-xs">
+        <span class="font-label-sm text-label-sm text-secondary tracking-widest uppercase">Atölyemizden</span>
+        <h2 id="gallery-title" class="font-headline-lg text-headline-lg-fluid text-primary">Galeri</h2>
+        <p class="font-body-md text-body-md text-on-surface-variant prose-width mx-auto mt-xs">
+          Çalışmalarımızdan fotoğraf ve videolar.
+        </p>
+      </div>
+
+      @if (galleryLoading()) {
+        <p class="text-center font-body-md text-on-surface-variant">Galeri yükleniyor…</p>
+      } @else if (!gallery().length) {
+        <p class="text-center font-body-md text-on-surface-variant">Henüz galeri içeriği eklenmemiş.</p>
+      } @else {
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-md">
+          @for (item of gallery(); track item.id) {
+            <button
+              type="button"
+              class="group relative rounded-2xl overflow-hidden shadow-premium border border-outline-variant/20 aspect-square bg-surface-container-low text-left"
+              (click)="openLightbox(item)"
+              [attr.aria-label]="item.title ?? (item.mediaType === 'Video' ? 'Video' : 'Fotoğraf')"
+            >
+              @if (item.mediaType === 'Photo') {
+                <img
+                  [src]="item.mediaUrl"
+                  [alt]="item.title ?? 'Galeri fotoğrafı'"
+                  loading="lazy"
+                  class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                />
+              } @else if (thumbnail(item); as thumb) {
+                <img
+                  [src]="thumb"
+                  [alt]="item.title ?? 'Galeri videosu'"
+                  loading="lazy"
+                  class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                />
+              } @else {
+                <div class="w-full h-full flex items-center justify-center bg-surface-container-low">
+                  <span class="material-symbols-outlined text-4xl text-primary">videocam</span>
+                </div>
+              }
+              @if (item.mediaType === 'Video') {
+                <span
+                  class="absolute inset-0 flex items-center justify-center bg-black/25 group-hover:bg-black/35 transition-colors"
+                >
+                  <span class="material-symbols-outlined text-5xl text-white filled-icon">play_circle</span>
+                </span>
+              }
+              @if (item.title) {
+                <span
+                  class="absolute bottom-0 left-0 right-0 px-sm py-xs bg-gradient-to-t from-black/70 to-transparent font-label-sm text-white"
+                >
+                  {{ item.title }}
+                </span>
+              }
+            </button>
+          }
+        </div>
+      }
+    </section>
+
+    @if (lightboxItem(); as active) {
+      <div
+        class="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 p-lg"
+        role="dialog"
+        aria-modal="true"
+        [attr.aria-label]="active.title ?? 'Galeri önizleme'"
+        (click)="closeLightbox()"
+        (keydown.escape)="closeLightbox()"
+      >
+        <button
+          type="button"
+          class="absolute top-lg right-lg text-white touch-target flex items-center justify-center rounded-full bg-black/40 hover:bg-black/60"
+          aria-label="Kapat"
+          (click)="closeLightbox(); $event.stopPropagation()"
+        >
+          <span class="material-symbols-outlined text-3xl">close</span>
+        </button>
+        <div class="max-w-5xl w-full max-h-[90vh] flex flex-col gap-sm" (click)="$event.stopPropagation()">
+          @if (active.mediaType === 'Photo') {
+            <img
+              [src]="active.mediaUrl"
+              [alt]="active.title ?? 'Galeri fotoğrafı'"
+              class="w-full max-h-[85vh] object-contain rounded-2xl"
+            />
+          } @else if (isEmbedVideo(active) && lightboxEmbedUrl(); as embed) {
+            <div class="aspect-video w-full rounded-2xl overflow-hidden bg-black">
+              <iframe
+                [src]="embed"
+                class="w-full h-full"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowfullscreen
+                title="{{ active.title ?? 'Galeri videosu' }}"
+              ></iframe>
+            </div>
+          } @else {
+            <video
+              [src]="active.mediaUrl"
+              controls
+              autoplay
+              class="w-full max-h-[85vh] rounded-2xl bg-black"
+            ></video>
+          }
+          @if (active.title) {
+            <p class="text-center font-body-md text-white">{{ active.title }}</p>
+          }
+        </div>
+      </div>
+    }
+
+    <!-- Contact & Location Section -->
+    <section
+      class="page-container section-padding w-full bg-surface-bright rounded-3xl mt-lg mb-4xl scroll-anchor"
+      id="iletisim"
+      aria-labelledby="contact-title"
+    >
+      <div class="text-center mb-2xl flex flex-col items-center gap-xs">
+        <span class="font-label-sm text-label-sm text-secondary tracking-widest uppercase"
+          >İletişim &amp; Konum</span
+        >
+        <h2
+          id="contact-title"
+          class="font-headline-lg text-headline-lg-fluid text-primary"
+        >
+          Bize Ulaşın
+        </h2>
+        <p class="font-body-md text-body-md text-on-surface-variant prose-width mx-auto mt-xs">
+          Sorularınız veya randevu talepleriniz için her zaman buradayız.
+        </p>
+      </div>
+      <div class="flex flex-col lg:flex-row gap-2xl">
+        <div class="w-full lg:w-1/3 flex flex-col gap-lg">
+          <div
+            class="bg-surface-container-lowest p-lg rounded-2xl border border-outline-variant/20 shadow-premium flex flex-col gap-md"
+          >
+            <div
+              class="w-12 h-12 rounded-xl bg-surface-container-low flex items-center justify-center text-primary"
+            >
+              <span class="material-symbols-outlined text-2xl">location_on</span>
+            </div>
+            <h3 class="font-headline-md text-headline-sm text-primary">Adres</h3>
+            <p class="font-body-md text-on-surface-variant">
+              {{ config.STREET_ADDRESS }}<br />{{ config.POSTAL_CODE }} {{ config.CITY }} / {{ config.REGION }}
+            </p>
+          </div>
+          <div
+            class="bg-surface-container-lowest p-lg rounded-2xl border border-outline-variant/20 shadow-premium flex flex-col gap-md"
+          >
+            <div
+              class="w-12 h-12 rounded-xl bg-surface-container-low flex items-center justify-center text-primary"
+            >
+              <span class="material-symbols-outlined text-2xl">call</span>
+            </div>
+            <h3 class="font-headline-md text-headline-sm text-primary">Telefon</h3>
+            <p class="font-body-md text-on-surface-variant">
+              <a [href]="phoneHref" class="hover:text-primary transition-colors">{{
+                config.PHONE_DISPLAY
+              }}</a>
+            </p>
+          </div>
+          <div
+            class="bg-surface-container-lowest p-lg rounded-2xl border border-outline-variant/20 shadow-premium flex flex-col gap-md"
+          >
+            <div
+              class="w-12 h-12 rounded-xl bg-surface-container-low flex items-center justify-center text-primary"
+            >
+              <span class="material-symbols-outlined text-2xl">schedule</span>
+            </div>
+            <h3 class="font-headline-md text-headline-sm text-primary">Çalışma Saatleri</h3>
+            <p class="font-body-md text-on-surface-variant">
+              {{ config.OPENING_HOURS_DISPLAY }}
+            </p>
+          </div>
+        </div>
+        <div
+          class="map-embed w-full lg:w-2/3 bg-surface-container-lowest rounded-2xl border border-outline-variant/20 shadow-premium relative"
+        >
+          <iframe
+            [src]="safeMapUrl"
+            width="100%"
+            height="100%"
+            style="border: 0"
+            allowfullscreen
+            loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade"
+            title="Yunus Auto Garage Aksaray harita konumu"
+            class="map-embed__frame"
+          ></iframe>
+          <a
+            [href]="config.GOOGLE_MAPS_DIRECTIONS_URL"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="absolute inset-0 z-10 cursor-pointer"
+            aria-label="Google Haritalar'da yol tarifi al"
+          ></a>
+        </div>
+      </div>
+    </section>

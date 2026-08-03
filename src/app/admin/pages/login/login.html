@@ -1,0 +1,53 @@
+<div class="min-h-screen bg-background flex items-center justify-center px-lg">
+  <div class="admin-card w-full max-w-md">
+    <h1 class="admin-page-title text-center mb-2xl">Admin Girişi</h1>
+    <form [formGroup]="form" (ngSubmit)="submit()" class="flex flex-col gap-md" novalidate>
+      @if (submitted() && form.invalid) {
+        <div class="admin-form-error-banner" role="alert">{{ formSummary }}</div>
+      }
+      <div>
+        <label for="username" class="font-label-md text-on-surface-variant">Kullanıcı Adı</label>
+        <input
+          id="username"
+          formControlName="username"
+          autocomplete="username"
+          class="admin-input"
+          [class.admin-input--error]="fieldInvalid('username')"
+        />
+        @if (fieldError('username'); as err) {
+          <p class="admin-field-error" role="alert">{{ err }}</p>
+        }
+      </div>
+      <div>
+        <label for="password" class="font-label-md text-on-surface-variant">Şifre</label>
+        <input
+          id="password"
+          type="password"
+          formControlName="password"
+          autocomplete="current-password"
+          class="admin-input"
+          [class.admin-input--error]="fieldInvalid('password')"
+        />
+        @if (fieldError('password'); as err) {
+          <p class="admin-field-error" role="alert">{{ err }}</p>
+        }
+      </div>
+      @if (error()) {
+        <p class="text-error font-body-md text-center">{{ error() }}</p>
+      }
+      <button
+        type="submit"
+        [disabled]="loading()"
+        [class.admin-btn--loading]="loading()"
+        class="admin-btn admin-btn--primary w-full"
+      >
+        @if (loading()) {
+          <app-admin-button-spinner variant="light" />
+          Giriş yapılıyor…
+        } @else {
+          Giriş Yap
+        }
+      </button>
+    </form>
+  </div>
+</div>

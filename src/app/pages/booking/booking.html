@@ -1,0 +1,239 @@
+<section class="page-container section-padding w-full">
+  @if (success(); as result) {
+    <div class="max-w-lg mx-auto text-center flex flex-col items-center gap-lg py-2xl">
+      <span class="material-symbols-outlined filled-icon text-5xl text-secondary">check_circle</span>
+      <h1 class="font-headline-lg text-headline-lg-fluid text-primary">Randevu talebiniz alındı</h1>
+      <div class="bg-surface-container-lowest p-lg rounded-2xl border border-outline-variant/20 shadow-premium w-full text-left">
+        <p class="font-body-md text-on-surface-variant mb-xs"><strong>{{ result.fullName }}</strong></p>
+        <p class="font-body-md text-on-surface-variant">{{ result.serviceName }}</p>
+        <p class="font-body-md text-on-surface-variant">{{ result.date }} — {{ result.timeSlot }}</p>
+        <p class="font-body-md text-on-surface-variant">{{ result.vehicleMake }} {{ result.vehicleModel }}</p>
+      </div>
+      <p class="font-body-md text-on-surface-variant prose-width mx-auto">
+        Randevunuz onaylandığında SMS ile bilgilendirileceksiniz.
+      </p>
+      <div class="flex flex-col sm:flex-row gap-md w-full">
+        <a [href]="whatsappHref" target="_blank" rel="noopener" class="btn-secondary flex-1">
+          <span class="material-symbols-outlined">chat</span> WhatsApp
+        </a>
+        <a routerLink="/" class="btn-primary flex-1">
+          Ana Sayfa
+        </a>
+      </div>
+    </div>
+  } @else {
+    <div class="text-center mb-2xl">
+      <h1 class="font-headline-lg text-headline-lg-fluid text-primary">
+        Online <span class="gradient-text">Randevu</span>
+      </h1>
+      <p class="font-body-md text-on-surface-variant mt-xs prose-width mx-auto">
+        Hizmet seçin, tarih ve saat belirleyin, bilgilerinizi girin. Onay sonrası SMS ile bilgilendirilirsiniz.
+      </p>
+    </div>
+
+    <!-- Step indicator -->
+    <div class="flex flex-wrap justify-center gap-xs md:gap-md mb-2xl">
+      @for (s of [1, 2, 3]; track s) {
+        <button
+          type="button"
+          class="touch-target px-lg py-sm rounded-full font-label-md text-label-md transition-colors"
+          [class.bg-secondary-container]="step() === s"
+          [class.text-on-secondary-container]="step() === s"
+          [class.bg-surface-container-low]="step() !== s"
+          [class.text-on-surface-variant]="step() !== s"
+          [class.cursor-pointer]="canGoToStep(s)"
+          [class.cursor-not-allowed]="!canGoToStep(s) && step() !== s"
+          [class.opacity-60]="!canGoToStep(s) && step() !== s"
+          (click)="canGoToStep(s) ? goToStep(s) : null"
+        >
+          {{ s }}. @if (s === 1) { Hizmet } @else if (s === 2) { Tarih & Saat } @else { Bilgiler }
+        </button>
+      }
+    </div>
+
+    @if (slotConflict()) {
+      <div class="mb-lg p-md bg-error-container text-error rounded-xl font-body-md text-center max-w-2xl mx-auto">
+        Bu saat az önce doldu, lütfen başka saat seçin.
+      </div>
+    }
+
+    <!-- Step 1: Service -->
+    @if (step() === 1) {
+      @if (servicesLoading()) {
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-lg max-w-4xl mx-auto">
+          @for (i of [1, 2, 3, 4]; track i) {
+            <div class="bg-surface-container-lowest p-lg rounded-2xl border border-outline-variant/20 animate-pulse h-40"></div>
+          }
+        </div>
+      } @else {
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-lg max-w-4xl mx-auto">
+          @for (service of services(); track service.id) {
+            <button
+              type="button"
+              class="text-left bg-surface-container-lowest p-lg rounded-2xl border border-outline-variant/20 shadow-premium hover:-translate-y-1 transition-transform flex flex-col gap-md"
+              [class.border-secondary-container]="selectedServiceId() === service.id"
+              [class.ring-2]="selectedServiceId() === service.id"
+              [class.ring-secondary-container]="selectedServiceId() === service.id"
+              (click)="selectService(service.id)"
+            >
+              <div class="w-12 h-12 rounded-xl bg-surface-container-low flex items-center justify-center text-primary">
+                <span class="material-symbols-outlined">{{ service.icon }}</span>
+              </div>
+              <h3 class="font-headline-md text-headline-sm text-primary">{{ service.name }}</h3>
+              <p class="font-body-md text-label-md text-on-surface-variant">{{ service.description }}</p>
+            </button>
+          }
+        </div>
+
+        @if (isOtherService()) {
+          <div class="max-w-4xl mx-auto mt-lg bg-surface-container-lowest p-lg rounded-2xl border border-outline-variant/20 shadow-premium">
+            <label for="customServiceNote" class="font-label-md text-label-md text-on-surface-variant">
+              Ne yaptırmak istiyorsunuz? *
+            </label>
+            <textarea
+              id="customServiceNote"
+              rows="3"
+              class="form-input"
+              placeholder="Örn: Far ayarı, cam değişimi, egzoz kontrolü..."
+              [value]="customServiceNote()"
+              (input)="customServiceNote.set($any($event.target).value)"
+            ></textarea>
+            @if (customServiceNoteError(); as err) {
+              <p class="text-error font-label-sm mt-xs">{{ err }}</p>
+            }
+            <button
+              type="button"
+              class="btn-primary mt-md"
+              (click)="continueOtherService()"
+            >
+              Devam Et
+              <span class="material-symbols-outlined">arrow_forward</span>
+            </button>
+          </div>
+        }
+      }
+    }
+
+    <!-- Step 2: Date & Time -->
+    @if (step() === 2) {
+      <div class="max-w-4xl mx-auto flex flex-col gap-2xl">
+        <div class="flex gap-md overflow-x-auto pb-md">
+          @for (day of days(); track day.date) {
+            <button
+              type="button"
+              class="flex-shrink-0 flex flex-col items-center touch-target px-lg py-md rounded-2xl border min-w-[80px]"
+              [class.bg-surface-container-lowest]="selectedDate() === day.date"
+              [class.border-secondary-container]="selectedDate() === day.date"
+              (click)="selectDate(day.date)"
+            >
+              <span class="font-label-sm text-label-sm">{{ day.dayName }}</span>
+              <span class="font-body-md font-bold">{{ day.label }}</span>
+            </button>
+          }
+        </div>
+
+        @if (selectedDate()) {
+          @if (slotsLoading()) {
+            <div class="flex gap-md flex-wrap">
+              @for (i of [1,2,3,4,5]; track i) {
+                <div class="h-11 w-20 bg-surface-container-low rounded-full animate-pulse"></div>
+              }
+            </div>
+          } @else {
+            <div class="flex gap-md flex-wrap">
+              @for (slot of slots(); track slot.time) {
+                <button
+                  type="button"
+                  class="touch-target px-lg py-sm rounded-full font-label-md border"
+                  [disabled]="!slot.available"
+                  [class.line-through]="!slot.available"
+                  [class.opacity-50]="!slot.available"
+                  [class.bg-secondary-container]="selectedTime() === slot.time"
+                  [class.border-secondary-container]="selectedTime() === slot.time"
+                  (click)="slot.available && selectTime(slot.time)"
+                >
+                  {{ slot.time }}
+                </button>
+              }
+            </div>
+          }
+        }
+      </div>
+    }
+
+    <!-- Step 3: Form -->
+    @if (step() === 3) {
+      <div class="max-w-4xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-2xl">
+        <form [formGroup]="form" class="flex flex-col gap-lg" (ngSubmit)="submit()">
+          <div>
+            <label for="fullName" class="font-label-md text-label-md text-on-surface-variant">Ad Soyad *</label>
+            <input id="fullName" formControlName="fullName" class="form-input" />
+            @if (fieldError('fullName'); as err) { <p class="text-error font-label-sm mt-xs">{{ err }}</p> }
+          </div>
+          <div>
+            <label for="phone" class="font-label-md text-label-md text-on-surface-variant">Telefon *</label>
+            <input id="phone" formControlName="phone" placeholder="05XX XXX XX XX" class="form-input" />
+            @if (fieldError('phone'); as err) { <p class="text-error font-label-sm mt-xs">{{ err }}</p> }
+          </div>
+          <div class="grid grid-cols-2 gap-md">
+            <div>
+              <label for="vehicleMake" class="font-label-md text-label-md text-on-surface-variant">Araç Marka *</label>
+              <input id="vehicleMake" formControlName="vehicleMake" class="form-input" />
+            </div>
+            <div>
+              <label for="vehicleModel" class="font-label-md text-label-md text-on-surface-variant">Araç Model *</label>
+              <input id="vehicleModel" formControlName="vehicleModel" class="form-input" />
+            </div>
+          </div>
+          @if (serviceOptions().length > 0) {
+            <fieldset class="flex flex-col gap-md">
+              <legend class="font-label-md text-label-md text-on-surface-variant mb-xs">İşlem seçin *</legend>
+              @for (option of serviceOptions(); track option) {
+                <label class="flex items-center gap-md cursor-pointer">
+                  <input
+                    type="checkbox"
+                    class="touch-target"
+                    [checked]="isOptionSelected(option)"
+                    (change)="toggleOption(option)"
+                  />
+                  <span class="font-body-md text-label-md text-on-surface-variant">{{ option }}</span>
+                </label>
+              }
+              @if (selectedOptionsError(); as err) {
+                <p class="text-error font-label-sm">{{ err }}</p>
+              }
+            </fieldset>
+          }
+          <label class="flex items-start gap-md cursor-pointer">
+            <input type="checkbox" formControlName="kvkkConsent" class="mt-1 touch-target" />
+            <span class="font-body-md text-label-md text-on-surface-variant">
+              Kişisel verilerimin randevu oluşturma amacıyla işlenmesini kabul ediyorum. *
+            </span>
+          </label>
+          @if (fieldError('kvkkConsent'); as err) { <p class="text-error font-label-sm">{{ err }}</p> }
+
+          <button
+            type="submit"
+            [disabled]="submitting()"
+            class="btn-primary disabled:opacity-50"
+          >
+            @if (submitting()) {
+              <span class="material-symbols-outlined animate-spin">progress_activity</span>
+            }
+            Randevu Talebi Gönder
+          </button>
+        </form>
+
+        <div class="bg-surface-container-lowest p-lg rounded-2xl border border-outline-variant/20 shadow-premium h-fit">
+          <h3 class="font-headline-md text-headline-sm text-primary mb-md">Özet</h3>
+          <p class="font-body-md text-on-surface-variant"><strong>Hizmet:</strong> {{ selectedServiceName() }}</p>
+          @if (selectedOptions().length > 0) {
+            <p class="font-body-md text-on-surface-variant"><strong>İşlemler:</strong> {{ selectedOptions().join(', ') }}</p>
+          }
+          <p class="font-body-md text-on-surface-variant"><strong>Tarih:</strong> {{ selectedDate() }}</p>
+          <p class="font-body-md text-on-surface-variant"><strong>Saat:</strong> {{ selectedTime() }}</p>
+        </div>
+      </div>
+    }
+  }
+</section>

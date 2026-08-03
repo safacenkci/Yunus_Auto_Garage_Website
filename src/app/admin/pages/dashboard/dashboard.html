@@ -1,0 +1,124 @@
+<h1 class="admin-page-title">Panel</h1>
+
+@if (loading()) {
+  <div class="grid grid-cols-2 lg:grid-cols-4 gap-md admin-section">
+    @for (i of [1, 2, 3, 4]; track i) {
+      <div class="admin-kpi-card">
+        <div class="admin-skeleton h-6 w-6 rounded-full"></div>
+        <div class="admin-skeleton h-10 w-16 mt-sm"></div>
+        <div class="admin-skeleton h-4 w-24 mt-xs"></div>
+      </div>
+    }
+  </div>
+  <div class="admin-section">
+    <div class="admin-skeleton h-6 w-40 mb-sm"></div>
+    @for (i of [1, 2, 3]; track i) {
+      <div class="admin-skeleton h-16 w-full mb-sm rounded-xl"></div>
+    }
+  </div>
+} @else if (error()) {
+  <div class="admin-card admin-section text-center">
+    <span class="material-symbols-outlined text-5xl text-error">error</span>
+    <p class="font-body-md text-on-surface-variant mt-sm">Panel verileri yüklenemedi.</p>
+    <button type="button" class="admin-btn admin-btn--outline mt-md" (click)="load()">Tekrar Dene</button>
+  </div>
+} @else if (summary(); as s) {
+  <div class="grid grid-cols-2 lg:grid-cols-4 gap-md admin-section">
+    <div class="admin-kpi-card">
+      <span class="material-symbols-outlined text-secondary">today</span>
+      <p class="font-headline-xl text-headline-lg-mobile text-primary mt-xs">{{ s.todayAppointments }}</p>
+      <p class="font-label-sm text-on-surface-variant">Bugünkü Randevular</p>
+    </div>
+    <div class="admin-kpi-card">
+      <span class="material-symbols-outlined text-secondary">pending</span>
+      <p class="font-headline-xl text-headline-lg-mobile text-primary mt-xs">{{ s.pendingCount }}</p>
+      <p class="font-label-sm text-on-surface-variant">Bekleyen Talepler</p>
+    </div>
+    <div class="admin-kpi-card">
+      <span class="material-symbols-outlined text-secondary">visibility</span>
+      <p class="font-headline-xl text-headline-lg-mobile text-primary mt-xs">{{ s.weeklyViews }}</p>
+      <p class="font-label-sm text-on-surface-variant">Haftalık Görüntülenme</p>
+    </div>
+    <div class="admin-kpi-card">
+      <span class="material-symbols-outlined text-secondary">event</span>
+      <p class="font-headline-xl text-headline-lg-mobile text-primary mt-xs">{{ s.totalAppointments }}</p>
+      <p class="font-label-sm text-on-surface-variant">Toplam Randevu</p>
+    </div>
+  </div>
+
+  <h2 class="admin-section-title">Son Talepler</h2>
+
+  @if (s.recentAppointments.length === 0) {
+    <div class="admin-card text-center admin-section">
+      <p class="font-body-md text-on-surface-variant">Henüz randevu talebi yok.</p>
+    </div>
+  } @else {
+    <div class="hidden md:block overflow-x-auto admin-section">
+      <table class="admin-table">
+        <thead class="admin-table-head">
+          <tr>
+            <th>Müşteri</th>
+            <th>Tarih/Saat</th>
+            <th>Hizmet</th>
+            <th>Durum</th>
+            <th>İşlem</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (apt of s.recentAppointments; track apt.id) {
+            <tr>
+              <td>
+                <p class="font-body-md font-bold">{{ apt.fullName }}</p>
+              </td>
+              <td class="whitespace-nowrap">{{ apt.date }} {{ apt.timeSlot }}</td>
+              <td>{{ apt.serviceName }}</td>
+              <td><span class="admin-badge" [class]="statusClass(apt.status)">{{ statusLabel(apt.status) }}</span></td>
+              <td>
+                @if (apt.status === 'Pending') {
+                  <div class="flex flex-wrap gap-xs">
+                    <button type="button" (click)="askApprove(apt.id)" class="admin-btn admin-btn--secondary admin-btn--sm">Onayla</button>
+                    <button type="button" (click)="askReject(apt.id)" class="admin-btn admin-btn--danger admin-btn--sm">Reddet</button>
+                  </div>
+                }
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <div class="md:hidden grid grid-cols-1 sm:grid-cols-2 gap-md admin-section">
+      @for (apt of s.recentAppointments; track apt.id) {
+        <div class="admin-card flex flex-col gap-sm">
+          <div class="flex flex-wrap items-start justify-between gap-sm">
+            <div class="min-w-0">
+              <p class="font-body-md font-bold truncate">{{ apt.fullName }}</p>
+              <p class="font-label-sm text-on-surface-variant">{{ apt.date }} {{ apt.timeSlot }}</p>
+              <p class="font-label-sm text-on-surface-variant truncate">{{ apt.serviceName }}</p>
+            </div>
+            <span class="admin-badge shrink-0" [class]="statusClass(apt.status)">{{ statusLabel(apt.status) }}</span>
+          </div>
+          @if (apt.status === 'Pending') {
+            <div class="flex flex-wrap gap-xs mt-auto">
+              <button type="button" (click)="askApprove(apt.id)" class="admin-btn admin-btn--secondary admin-btn--sm">Onayla</button>
+              <button type="button" (click)="askReject(apt.id)" class="admin-btn admin-btn--danger admin-btn--sm">Reddet</button>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  }
+}
+
+@if (pendingConfirm(); as confirm) {
+  <app-admin-confirm-modal
+    [open]="true"
+    [kind]="confirm.kind"
+    [description]="confirm.description"
+    [confirmLabel]="confirm.confirmLabel"
+    [confirmVariant]="confirm.confirmVariant"
+    [loading]="confirming()"
+    (cancelled)="closeConfirm()"
+    (confirmed)="submitConfirm()"
+  />
+}

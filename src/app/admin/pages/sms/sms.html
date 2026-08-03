@@ -1,0 +1,132 @@
+<h1 class="admin-page-title">SMS</h1>
+
+<div class="admin-section">
+  <div class="admin-segment">
+    <button
+      type="button"
+      class="admin-segment-btn"
+      [class.admin-segment-btn--active]="tab() === 'send'"
+      (click)="tab.set('send')"
+    >
+      Toplu Gönderim
+    </button>
+    <button
+      type="button"
+      class="admin-segment-btn"
+      [class.admin-segment-btn--active]="tab() === 'history'"
+      (click)="tab.set('history')"
+    >
+      Geçmiş
+    </button>
+  </div>
+</div>
+
+@if (tab() === 'send') {
+  <form [formGroup]="form" class="admin-card flex flex-col gap-md admin-section max-w-3xl" novalidate>
+    @if (submitted() && (form.invalid || fieldInvalid('manualNumbers'))) {
+      <div class="admin-form-error-banner" role="alert">{{ formSummary }}</div>
+    }
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-md">
+      <div>
+        <label for="recipientSource" class="font-label-md">Alıcı Kaynağı</label>
+        <select id="recipientSource" formControlName="recipientSource" class="admin-input">
+          <option value="all">Tüm müşteriler (tekil telefonlar)</option>
+          <option value="status">Duruma göre</option>
+          <option value="manual">Elle numara girişi</option>
+        </select>
+      </div>
+      @if (form.getRawValue().recipientSource === 'status') {
+        <div>
+          <label for="statusFilter" class="font-label-md">Durum Filtresi</label>
+          <select id="statusFilter" formControlName="statusFilter" class="admin-input">
+            <option value="Pending">Bekleyen</option>
+            <option value="Confirmed">Onaylı</option>
+            <option value="Completed">Tamamlanan</option>
+          </select>
+        </div>
+      }
+    </div>
+    @if (form.getRawValue().recipientSource === 'manual') {
+      <div>
+        <label for="manualNumbers" class="font-label-md">Numaralar</label>
+        <textarea
+          id="manualNumbers"
+          formControlName="manualNumbers"
+          rows="3"
+          placeholder="532..., 533..."
+          class="admin-input"
+          [class.admin-input--error]="fieldInvalid('manualNumbers')"
+        ></textarea>
+        @if (fieldError('manualNumbers'); as err) {
+          <p class="admin-field-error" role="alert">{{ err }}</p>
+        }
+      </div>
+    }
+    <div>
+      <label for="message" class="font-label-md">Mesaj</label>
+      <textarea
+        id="message"
+        formControlName="message"
+        rows="4"
+        class="admin-input"
+        [class.admin-input--error]="fieldInvalid('message')"
+      ></textarea>
+      @if (fieldError('message'); as err) {
+        <p class="admin-field-error" role="alert">{{ err }}</p>
+      }
+      <p class="font-label-sm text-on-surface-variant mt-xs">{{ charCount() }} karakter — ~{{ smsCount() }} SMS</p>
+    </div>
+    <div class="p-md bg-secondary-container/30 rounded-xl font-label-sm text-on-surface-variant border border-secondary/20">
+      İYS Uyarısı: Ticari içerikli toplu SMS gönderimleri için İYS onayı gereklidir.
+    </div>
+    <button
+      type="button"
+      (click)="askSend()"
+      [disabled]="sending()"
+      [class.admin-btn--loading]="sending()"
+      class="admin-btn admin-btn--primary w-fit"
+    >
+      @if (sending()) {
+        <app-admin-button-spinner variant="light" />
+        Gönderiliyor…
+      } @else {
+        Gönder
+      }
+    </button>
+    @if (result()) { <p class="font-body-md">{{ result() }}</p> }
+  </form>
+} @else {
+  <div class="overflow-x-auto admin-section">
+    <table class="admin-table">
+      <thead class="admin-table-head">
+        <tr>
+          <th>Tarih</th>
+          <th>Tip</th>
+          <th>Alıcı</th>
+          <th>Durum</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (log of logs(); track log.id) {
+          <tr>
+            <td class="whitespace-nowrap">{{ log.createdAt | date:'dd.MM.yyyy HH:mm' }}</td>
+            <td>{{ log.type }}</td>
+            <td>{{ log.recipientCount }}</td>
+            <td>{{ log.success ? 'Başarılı' : log.resultCode }}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+}
+
+@if (showConfirm()) {
+  <app-admin-confirm-modal
+    [open]="true"
+    kind="send"
+    confirmLabel="Gönder"
+    [loading]="sending()"
+    (cancelled)="closeConfirm()"
+    (confirmed)="send()"
+  />
+}

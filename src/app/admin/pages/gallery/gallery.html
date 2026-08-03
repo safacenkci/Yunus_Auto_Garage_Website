@@ -1,0 +1,242 @@
+<h1 class="admin-page-title">Galeri Yönetimi</h1>
+
+<div class="grid grid-cols-1 lg:grid-cols-[minmax(280px,380px)_1fr] gap-lg admin-section items-start">
+  <form [formGroup]="form" class="admin-card flex flex-col gap-md lg:sticky lg:top-lg" novalidate>
+    @if (submitted() && mediaMissing()) {
+      <div class="admin-form-error-banner" role="alert">{{ formSummary }}</div>
+    }
+    <h2 class="font-headline-sm text-primary admin-section-title admin-section-title--inset">
+      @if (editingId()) { Öğeyi Düzenle } @else { Yeni Öğe Ekle }
+    </h2>
+
+    <div class="grid grid-cols-2 gap-md">
+      <div>
+        <label for="mediaType" class="font-label-md">Medya Türü</label>
+        <select id="mediaType" formControlName="mediaType" class="admin-input">
+          <option value="Photo">Fotoğraf</option>
+          <option value="Video">Video</option>
+        </select>
+      </div>
+      <div>
+        <label for="sortOrder" class="font-label-md">Sıra</label>
+        <input id="sortOrder" type="number" formControlName="sortOrder" class="admin-input" min="0" />
+      </div>
+    </div>
+
+    <div>
+      <label for="galleryTitle" class="font-label-md">Başlık (opsiyonel)</label>
+      <input id="galleryTitle" formControlName="title" class="admin-input" placeholder="Örn: Boya işlemi" />
+    </div>
+
+    <div class="flex items-center justify-between gap-md py-xs">
+      <div>
+        <p class="font-label-md">Yayın Durumu</p>
+        <p class="admin-toggle__hint mt-xs">
+          @if (form.getRawValue().isActive) {
+            Galeri öğesi ziyaretçilere görünür.
+          } @else {
+            Galeri öğesi gizli kalır.
+          }
+        </p>
+      </div>
+      <label class="admin-toggle shrink-0">
+        <input type="checkbox" formControlName="isActive" class="admin-toggle__input" />
+        <span class="admin-toggle__track" aria-hidden="true">
+          <span class="admin-toggle__thumb"></span>
+        </span>
+        <span class="admin-toggle__label">Yayında</span>
+      </label>
+    </div>
+
+    <div>
+      <label for="galleryFile" class="font-label-md">
+        @if (form.getRawValue().mediaType === 'Photo') {
+          Fotoğraf Dosyası
+        } @else {
+          Video Dosyası (opsiyonel)
+        }
+      </label>
+      <div
+        class="admin-dropzone"
+        [class.admin-dropzone--active]="dragOver()"
+        [class.admin-dropzone--filled]="selectedFile"
+        [class.admin-dropzone--error]="dropzoneInvalid()"
+        role="button"
+        tabindex="0"
+        (click)="galleryFileInput.click()"
+        (keydown.enter)="galleryFileInput.click()"
+        (keydown.space)="$event.preventDefault(); galleryFileInput.click()"
+        (dragover)="onDragOver($event)"
+        (dragleave)="onDragLeave($event)"
+        (drop)="onDrop($event)"
+      >
+        <input
+          #galleryFileInput
+          id="galleryFile"
+          type="file"
+          class="sr-only"
+          [accept]="form.getRawValue().mediaType === 'Photo' ? 'image/*' : 'video/mp4,video/webm'"
+          (change)="onFileSelected($event)"
+          (click)="$event.stopPropagation()"
+        />
+
+        @if (filePreviewUrl(); as preview) {
+          <img [src]="preview" [alt]="selectedFile?.name ?? 'Önizleme'" class="admin-dropzone__preview" />
+          <div class="admin-dropzone__file-row">
+            <span class="material-symbols-outlined text-primary shrink-0">image</span>
+            <div class="min-w-0">
+              <p class="admin-dropzone__filename">{{ selectedFile?.name }}</p>
+              @if (selectedFile; as file) {
+                <p class="admin-dropzone__meta">{{ formatFileSize(file.size) }}</p>
+              }
+            </div>
+            <button
+              type="button"
+              class="admin-dropzone__clear shrink-0"
+              (click)="clearSelectedFile(galleryFileInput, $event)"
+            >
+              Kaldır
+            </button>
+          </div>
+        } @else if (selectedFile; as file) {
+          <div class="admin-dropzone__file-row">
+            <span class="material-symbols-outlined text-primary shrink-0">videocam</span>
+            <div class="min-w-0">
+              <p class="admin-dropzone__filename">{{ file.name }}</p>
+              <p class="admin-dropzone__meta">{{ formatFileSize(file.size) }}</p>
+            </div>
+            <button
+              type="button"
+              class="admin-dropzone__clear shrink-0"
+              (click)="clearSelectedFile(galleryFileInput, $event)"
+            >
+              Kaldır
+            </button>
+          </div>
+        } @else {
+          <span class="material-symbols-outlined admin-dropzone__icon">
+            @if (form.getRawValue().mediaType === 'Photo') {
+              add_photo_alternate
+            } @else {
+              video_file
+            }
+          </span>
+          <p class="admin-dropzone__hint">Sürükleyip bırakın veya dosya seçin</p>
+          <p class="admin-dropzone__formats">
+            @if (form.getRawValue().mediaType === 'Photo') {
+              PNG, JPG, WebP ve diğer görsel formatları
+            } @else {
+              MP4, WebM
+            }
+          </p>
+        }
+      </div>
+      @if (dropzoneError(); as err) {
+        <p class="admin-field-error" role="alert">{{ err }}</p>
+      }
+      @if (editingId()) {
+        <p class="font-label-sm text-on-surface-variant mt-xs">Boş bırakırsanız mevcut dosya korunur.</p>
+      }
+    </div>
+
+    @if (form.getRawValue().mediaType === 'Video') {
+      <div>
+        <label for="embedUrl" class="font-label-md">YouTube / Vimeo URL (opsiyonel)</label>
+        <input
+          id="embedUrl"
+          formControlName="embedUrl"
+          class="admin-input"
+          [class.admin-input--error]="dropzoneInvalid()"
+          placeholder="https://www.youtube.com/watch?v=..."
+        />
+        <p class="font-label-sm text-on-surface-variant mt-xs">
+          Dosya yüklemeden video eklemek için YouTube veya Vimeo bağlantısı girin.
+        </p>
+      </div>
+    }
+
+    @if (error()) {
+      <p class="font-label-sm text-error">{{ error() }}</p>
+    }
+
+    <div class="flex flex-wrap gap-sm">
+      <button
+        type="button"
+        (click)="askSubmit()"
+        class="admin-btn admin-btn--primary"
+        [disabled]="confirming()"
+        [class.admin-btn--loading]="confirming()"
+      >
+        @if (confirming()) {
+          <app-admin-button-spinner variant="light" />
+          İşleniyor…
+        } @else if (editingId()) {
+          Güncelle
+        } @else {
+          Ekle
+        }
+      </button>
+      @if (editingId()) {
+        <button type="button" (click)="resetForm()" class="admin-btn admin-btn--secondary">İptal</button>
+      }
+    </div>
+  </form>
+
+  <div class="min-w-0">
+    <h2 class="admin-section-title">Mevcut Galeri Öğeleri</h2>
+
+    @if (loading() && !items().length) {
+      <p class="font-body-md text-on-surface-variant">Yükleniyor…</p>
+    } @else if (!items().length) {
+      <p class="font-body-md text-on-surface-variant">Henüz galeri öğesi yok.</p>
+    } @else {
+      <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-md">
+        @for (item of items(); track item.id) {
+          <div class="admin-card flex flex-col gap-sm">
+            <div class="relative aspect-video rounded-lg overflow-hidden bg-surface-container-low">
+              @if (item.mediaType === 'Photo') {
+                <img [src]="item.mediaUrl" [alt]="item.title ?? 'Galeri'" class="w-full h-full object-cover" />
+              } @else if (thumbnail(item); as thumb) {
+                <img [src]="thumb" [alt]="item.title ?? 'Video'" class="w-full h-full object-cover" />
+                <span class="absolute inset-0 flex items-center justify-center bg-black/20">
+                  <span class="material-symbols-outlined text-4xl text-white">play_circle</span>
+                </span>
+              } @else {
+                <div class="w-full h-full flex items-center justify-center">
+                  <span class="material-symbols-outlined text-4xl text-primary">videocam</span>
+                </div>
+              }
+            </div>
+            <div class="flex items-start justify-between gap-sm">
+              <div class="min-w-0">
+                <p class="font-body-md font-bold truncate">{{ item.title || (isVideo(item) ? 'Video' : 'Fotoğraf') }}</p>
+                <p class="font-label-sm text-on-surface-variant">
+                  {{ isVideo(item) ? 'Video' : 'Fotoğraf' }} · Sıra {{ item.sortOrder }}
+                  @if (!item.isActive) { · Gizli }
+                </p>
+              </div>
+              <div class="flex gap-xs shrink-0">
+                <button type="button" (click)="startEdit(item)" class="admin-btn admin-btn--sm">Düzenle</button>
+                <button type="button" (click)="askRemove(item.id)" class="admin-btn admin-btn--danger admin-btn--sm">
+                  Sil
+                </button>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    }
+  </div>
+</div>
+
+@if (pendingConfirm(); as confirm) {
+  <app-admin-confirm-modal
+    [open]="true"
+    [kind]="confirm.action === 'delete' ? 'delete' : submitConfirmKind()"
+    [confirmLabel]="confirm.action === 'delete' ? 'Sil' : submitConfirmLabel()"
+    [confirmVariant]="confirm.action === 'delete' ? 'danger' : 'primary'"
+    [loading]="confirming()"
+    (cancelled)="closeConfirm()"
+    (confirmed)="submitConfirm()"
+  />
+}

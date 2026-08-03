@@ -1,0 +1,62 @@
+<h1 class="admin-page-title">Analitik</h1>
+
+<div class="admin-section flex flex-wrap gap-md">
+  @for (d of [7, 30, 90]; track d) {
+    <button
+      type="button"
+      class="admin-chip"
+      [class.admin-chip--active]="days() === d"
+      (click)="setDays(d)"
+    >
+      {{ d }} gün
+    </button>
+  }
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-lg admin-section items-start">
+  <div class="admin-card lg:col-span-2 h-[280px] md:h-[320px]">
+    <canvas #chartCanvas></canvas>
+  </div>
+
+  @if (data(); as d) {
+    <div class="admin-card flex flex-col gap-md">
+      <div>
+        <p class="font-label-sm text-on-surface-variant">Toplam randevu</p>
+        <p class="font-headline-lg text-primary">{{ d.totalAppointments }}</p>
+      </div>
+      <div>
+        <p class="font-label-sm text-on-surface-variant">Seçilen dönem</p>
+        <p class="font-body-md font-bold">{{ days() }} gün</p>
+      </div>
+    </div>
+  } @else {
+    <div class="admin-card flex flex-col gap-md">
+      <div class="admin-skeleton h-4 w-24"></div>
+      <div class="admin-skeleton h-8 w-16"></div>
+      <div class="admin-skeleton h-4 w-20 mt-md"></div>
+      <div class="admin-skeleton h-6 w-12"></div>
+    </div>
+  }
+</div>
+
+@if (data(); as d) {
+  <h2 class="admin-section-title">En Çok Gezilen Sayfalar</h2>
+  <div class="overflow-x-auto admin-section">
+    <table class="admin-table">
+      <thead class="admin-table-head">
+        <tr>
+          <th>Sayfa</th>
+          <th class="text-right">Görüntülenme</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (p of d.topPages; track p.path) {
+          <tr>
+            <td>{{ p.path }}</td>
+            <td class="text-right">{{ p.views }}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+}

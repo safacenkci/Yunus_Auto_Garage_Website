@@ -6,10 +6,10 @@
     <base href="/" />
 
     <!-- ─── SEO: Title & Description ─────────────────────────── -->
-    <title>Yunus Auto Garage | Modern Automotive Service</title>
+    <title>Yunus Auto Garage | Aksaray Oto Servis</title>
     <meta
       name="description"
-      content="Aksaray sanayi sitesinde oto elektrikçi. Akü, marş, alternatör, arıza tespiti. Yolda kaldınız mı? Hemen arayın: 05XX XXX XX XX."
+      content="Aksaray sanayi sitesinde elektronik arıza, klima dolumu ve oto tuning. İlk randevunuzda %20 indirim. Hemen arayın: 0536 239 29 68."
     />
     <meta name="robots" content="index, follow" />
     <link rel="canonical" href="https://aksarayotoelektrik.com" />
@@ -18,10 +18,10 @@
     <meta property="og:type" content="website" />
     <meta property="og:locale" content="tr_TR" />
     <meta property="og:url" content="https://aksarayotoelektrik.com" />
-    <meta property="og:title" content="Yunus Auto Garage | Modern Automotive Service" />
+    <meta property="og:title" content="Yunus Auto Garage | Aksaray Oto Servis" />
     <meta
       property="og:description"
-      content="Aksaray sanayi sitesinde oto elektrikçi. Akü, marş, alternatör, arıza tespiti. Yolda kaldınız mı? Hemen arayın."
+      content="Elektronik arıza, klima dolumu ve oto tuning. İlk randevunuzda %20 indirim. Aksaray sanayi sitesinde profesyonel hizmet."
     />
     <meta property="og:image" content="https://aksarayotoelektrik.com/assets/og-image.webp" />
     <meta property="og:image:width" content="1200" />
@@ -30,10 +30,10 @@
 
     <!-- ─── Twitter Card ─────────────────────────────────────── -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Yunus Auto Garage | Modern Automotive Service" />
+    <meta name="twitter:title" content="Yunus Auto Garage | Aksaray Oto Servis" />
     <meta
       name="twitter:description"
-      content="Aksaray sanayi sitesinde oto elektrikçi. Akü, marş, alternatör, arıza tespiti."
+      content="Elektronik arıza, klima dolumu ve oto tuning. İlk randevunuzda %20 indirim."
     />
     <meta name="twitter:image" content="https://aksarayotoelektrik.com/assets/og-image.webp" />
 
@@ -117,14 +117,17 @@
               '3xl': '1.5rem',
             },
             spacing: {
-              xl: '80px',
-              base: '8px',
               xs: '4px',
-              sm: '12px',
-              gutter: '24px',
+              sm: '8px',
+              md: '16px',
+              lg: '24px',
+              xl: '32px',
+              '2xl': '48px',
+              '3xl': '64px',
+              '4xl': '80px',
+            },
+            maxWidth: {
               'container-max': '1280px',
-              lg: '48px',
-              md: '24px',
             },
             fontFamily: {
               'body-lg': ['Inter'],
@@ -139,12 +142,21 @@
             fontSize: {
               'body-lg': ['18px', { lineHeight: '1.6', fontWeight: '400' }],
               'headline-md': ['24px', { lineHeight: '1.3', fontWeight: '600' }],
+              'headline-sm': ['20px', { lineHeight: '1.3', fontWeight: '600' }],
               'label-sm': ['12px', { lineHeight: '1.2', fontWeight: '500' }],
               'headline-lg': ['32px', { lineHeight: '1.2', fontWeight: '700' }],
               'body-md': ['16px', { lineHeight: '1.6', fontWeight: '400' }],
               'headline-xl': [
                 '48px',
                 { lineHeight: '1.1', letterSpacing: '-0.02em', fontWeight: '700' },
+              ],
+              'headline-fluid': [
+                'clamp(1.75rem, 4vw + 1rem, 3rem)',
+                { lineHeight: '1.1', letterSpacing: '-0.02em', fontWeight: '700' },
+              ],
+              'headline-lg-fluid': [
+                'clamp(1.5rem, 3vw + 0.75rem, 2rem)',
+                { lineHeight: '1.2', fontWeight: '700' },
               ],
               'label-md': ['14px', { lineHeight: '1.2', letterSpacing: '0.01em', fontWeight: '600' }],
               'headline-lg-mobile': ['24px', { lineHeight: '1.2', fontWeight: '700' }],
@@ -165,30 +177,36 @@
         "name": "Yunus Auto Garage",
         "image": "https://aksarayotoelektrik.com/assets/logo.webp",
         "url": "https://aksarayotoelektrik.com",
-        "telephone": "+905XXXXXXXXX",
+        "description": "Elektronik arıza, klima dolumu ve oto tuning. İlk randevunuzda %20 indirim.",
+        "telephone": "+905362392968",
         "priceRange": "₺₺",
         "address": {
           "@type": "PostalAddress",
-          "streetAddress": "Aksaray Sanayi Sitesi, X. Blok No: Y",
-          "addressLocality": "Aksaray",
+          "streetAddress": "8630. Sk., Bahçesaray",
+          "addressLocality": "Aksaray Merkez",
           "addressRegion": "Aksaray",
           "postalCode": "68100",
           "addressCountry": "TR"
         },
         "geo": {
           "@type": "GeoCoordinates",
-          "latitude": "38.3713",
-          "longitude": "34.0212"
+          "latitude": "38.310633",
+          "longitude": "33.995505"
         },
         "areaServed": "Aksaray",
         "openingHoursSpecification": [
           {
             "@type": "OpeningHoursSpecification",
-            "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
-            "opens": "08:30",
+            "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
+            "opens": "10:00",
             "closes": "19:00"
           }
         ],
+        "makesOffer": {
+          "@type": "Offer",
+          "description": "İlk randevunuzda %20 indirim",
+          "priceCurrency": "TRY"
+        },
         "sameAs": [
           "https://g.page/BURAYA_GBP_LINKI",
           "https://instagram.com/BURAYA_INSTAGRAM",

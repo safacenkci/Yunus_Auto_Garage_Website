@@ -1,0 +1,6 @@
+@YunusAutoGarage.Api_HostAddress = http://localhost:5067
+
+GET {{YunusAutoGarage.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
