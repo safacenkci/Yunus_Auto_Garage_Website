@@ -1,0 +1,152 @@
+<section class="page-container section-padding w-full max-w-2xl mx-auto">
+  <div class="mb-xl">
+    <a routerLink="/" class="touch-target inline-flex items-center gap-xs text-on-surface-variant hover:text-primary font-label-sm">
+      <span class="material-symbols-outlined text-base">arrow_back</span>
+      Ana sayfa
+    </a>
+  </div>
+
+  @if (loading()) {
+    <div class="flex flex-col items-center gap-md py-2xl text-on-surface-variant">
+      <span class="material-symbols-outlined text-4xl animate-pulse">progress_activity</span>
+      <p class="font-body-md">Araç durumu yükleniyor…</p>
+    </div>
+  } @else if (notFound()) {
+    <div
+      class="rounded-3xl border border-outline-variant/30 bg-surface-container-low p-lg md:p-2xl text-center flex flex-col items-center gap-md"
+    >
+      <span class="material-symbols-outlined text-5xl text-on-surface-variant">link_off</span>
+      <h1 class="font-headline-lg text-headline-lg text-primary">Takip linki geçersiz</h1>
+      <p class="font-body-md text-on-surface-variant max-w-md">
+        Bu bağlantı bulunamadı veya artık geçerli değil. Yardım için bizi arayabilirsiniz.
+      </p>
+      <a [href]="phoneHref" class="btn-primary mt-md">
+        <span class="material-symbols-outlined">call</span>
+        {{ config.PHONE_DISPLAY }}
+      </a>
+    </div>
+  } @else if (data(); as tracking) {
+    <div class="flex flex-col gap-xl">
+      <header class="flex flex-col gap-xs">
+        <span class="font-label-sm text-label-sm text-secondary tracking-widest uppercase">Araç Takibi</span>
+        <h1 class="font-headline-lg text-headline-lg-fluid text-primary">{{ config.BUSINESS_NAME }}</h1>
+        <p class="font-body-md text-on-surface-variant">
+          {{ tracking.vehicleMake }} {{ tracking.vehicleModel }}
+          @if (tracking.vehicleYear) {
+            <span> ({{ tracking.vehicleYear }})</span>
+          }
+          @if (tracking.licensePlate) {
+            <span> · {{ tracking.licensePlate }}</span>
+          }
+        </p>
+      </header>
+
+      <div
+        class="rounded-3xl border border-outline-variant/30 bg-surface-bright p-lg md:p-xl flex flex-col gap-md"
+      >
+        <div class="flex flex-wrap gap-md justify-between items-start">
+          <div>
+            <p class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest">Hizmet</p>
+            <p class="font-body-md font-bold text-primary">{{ tracking.serviceName }}</p>
+          </div>
+          <div>
+            <p class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest">Randevu</p>
+            <p class="font-body-md font-bold text-primary">
+              {{ formatDate(tracking.appointmentDate) }} {{ tracking.timeSlot }}
+            </p>
+          </div>
+        </div>
+
+        <div
+          class="rounded-2xl bg-secondary-container/40 border border-secondary/25 px-md py-md flex flex-col gap-xs"
+        >
+          <p class="font-label-sm text-label-sm text-on-secondary-container uppercase tracking-widest">
+            Güncel durum
+          </p>
+          <p class="font-headline-md text-headline-md text-on-secondary-container font-bold">
+            {{ tracking.vehicleWorkStatusLabel }}
+          </p>
+        </div>
+
+        @if (tracking.estimatedCompletionAt) {
+          <div
+            class="rounded-2xl bg-surface-container-low border border-outline-variant/30 px-md py-md flex items-center gap-md"
+          >
+            <span class="material-symbols-outlined text-primary">schedule</span>
+            <div>
+              <p class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest">
+                Tahmini bitiş
+              </p>
+              <p class="font-body-md font-bold text-primary">
+                {{ tracking.estimatedCompletionAt | date: 'dd.MM.yyyy HH:mm' }}
+              </p>
+            </div>
+          </div>
+        }
+
+        @if (tracking.trackingNote) {
+          <div
+            class="rounded-2xl bg-surface-container-low border border-outline-variant/30 px-md py-md"
+          >
+            <p class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest mb-xs">
+              Atölye notu
+            </p>
+            <p class="font-body-md text-on-surface">{{ tracking.trackingNote }}</p>
+          </div>
+        }
+      </div>
+
+      <div class="rounded-3xl border border-outline-variant/30 bg-surface-bright p-lg md:p-xl">
+        <h2 class="font-headline-md text-headline-md text-primary mb-xl">İşlem adımları</h2>
+        <ol class="flex flex-col gap-0 relative">
+          @for (step of tracking.timeline; track step.status; let last = $last) {
+            <li class="flex gap-md relative pb-xl" [class.pb-0]="last">
+              @if (!last) {
+                <span
+                  class="absolute left-[15px] top-8 bottom-0 w-0.5"
+                  [class]="step.isCompleted ? 'bg-secondary' : 'bg-outline-variant/40'"
+                  aria-hidden="true"
+                ></span>
+              }
+              <div
+                class="relative z-10 w-8 h-8 rounded-full flex items-center justify-center shrink-0 border-2"
+                [class]="
+                  step.isCompleted || step.isCurrent
+                    ? 'bg-secondary-container border-secondary text-on-secondary-container'
+                    : 'bg-surface-container-low border-outline-variant/50 text-on-surface-variant'
+                "
+              >
+                @if (step.isCompleted) {
+                  <span class="material-symbols-outlined text-base">check</span>
+                } @else if (step.isCurrent) {
+                  <span class="material-symbols-outlined text-base animate-pulse">radio_button_checked</span>
+                } @else {
+                  <span class="w-2 h-2 rounded-full bg-outline-variant"></span>
+                }
+              </div>
+              <div class="flex flex-col gap-xs pt-xs min-w-0">
+                <p
+                  class="font-body-md font-bold"
+                  [class]="step.isCurrent || step.isCompleted ? 'text-primary' : 'text-on-surface-variant'"
+                >
+                  {{ step.label }}
+                </p>
+                @if (step.completedAt) {
+                  <p class="font-label-sm text-label-sm text-on-surface-variant">
+                    {{ step.completedAt | date: 'dd.MM.yyyy HH:mm' }}
+                  </p>
+                } @else if (step.isCurrent) {
+                  <p class="font-label-sm text-label-sm text-secondary">Devam ediyor</p>
+                }
+              </div>
+            </li>
+          }
+        </ol>
+      </div>
+
+      <p class="font-label-sm text-label-sm text-on-surface-variant text-center">
+        Bu sayfa otomatik olarak güncellenir.
+      </p>
+    </div>
+  }
+</section>

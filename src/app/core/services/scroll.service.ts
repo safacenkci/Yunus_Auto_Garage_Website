@@ -75,6 +75,35 @@ export class ScrollService {
     attempt(maxAttempts);
   }
 
+  scrollToTop(smooth = true): void {
+    if (!isPlatformBrowser(this.platformId)) {
+      return;
+    }
+
+    this.document.defaultView?.scrollTo({
+      top: 0,
+      behavior: smooth ? 'smooth' : 'auto',
+    });
+  }
+
+  navigateToTop(): void {
+    if (!isPlatformBrowser(this.platformId)) {
+      return;
+    }
+
+    const scroll = () => this.scrollToTop(this.isOnHomeRoute());
+
+    if (this.isOnHomeRoute()) {
+      scroll();
+      if (this.getCurrentFragment()) {
+        void this.router.navigate(['/'], { replaceUrl: true });
+      }
+      return;
+    }
+
+    void this.router.navigate(['/']).then(() => scroll());
+  }
+
   navigateToHomeSection(fragment: string): void {
     if (!isPlatformBrowser(this.platformId)) {
       return;

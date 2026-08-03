@@ -21,6 +21,7 @@ builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection(JwtOptio
 builder.Services.Configure<AdminSeedOptions>(builder.Configuration.GetSection(AdminSeedOptions.SectionName));
 builder.Services.Configure<NetgsmOptions>(builder.Configuration.GetSection(NetgsmOptions.SectionName));
 builder.Services.Configure<StorageOptions>(builder.Configuration.GetSection(StorageOptions.SectionName));
+builder.Services.Configure<PublicSiteOptions>(builder.Configuration.GetSection(PublicSiteOptions.SectionName));
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("Default")));
@@ -36,6 +37,8 @@ builder.Services.AddScoped<ISmsService, NetgsmSmsService>();
 builder.Services.AddScoped<FileStorageService>();
 builder.Services.AddScoped<GalleryService>();
 builder.Services.AddScoped<PromoBannerService>();
+builder.Services.AddScoped<VehicleLookupService>();
+builder.Services.AddScoped<TrackingService>();
 
 builder.Services.AddHostedService<SmsReminderJob>();
 
@@ -98,6 +101,16 @@ builder.Services.AddRateLimiter(options =>
                 Window = TimeSpan.FromMinutes(1),
                 QueueLimit = 0
             }));
+
+    options.AddPolicy("tracking", httpContext =>
+        RateLimitPartition.GetFixedWindowLimiter(
+            httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+            _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 60,
+                Window = TimeSpan.FromMinutes(1),
+                QueueLimit = 0
+            }));
 });
 
 if (builder.Environment.IsDevelopment())
@@ -145,7 +158,7 @@ using (var scope = app.Services.CreateScope())
     try
     {
         await db.Database.MigrateAsync();
-        await DataSeeder.SeedAsync(db, app.Configuration);
+        await DataSeeder.SeedAsync(db, app.Configuration, app.Environment);
     }
     catch (Exception ex) when (ex is Npgsql.NpgsqlException or TimeoutException)
     {

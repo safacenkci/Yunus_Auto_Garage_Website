@@ -37,6 +37,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             entity.Property(e => e.Phone).HasColumnName("phone").HasMaxLength(15);
             entity.Property(e => e.VehicleMake).HasColumnName("vehicle_make").HasMaxLength(100);
             entity.Property(e => e.VehicleModel).HasColumnName("vehicle_model").HasMaxLength(100);
+            entity.Property(e => e.VehicleYear).HasColumnName("vehicle_year");
             entity.Property(e => e.LicensePlate).HasColumnName("license_plate").HasMaxLength(20);
             entity.Property(e => e.ServiceId).HasColumnName("service_id");
             entity.Property(e => e.Date).HasColumnName("date");
@@ -46,10 +47,19 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             entity.Property(e => e.KvkkConsent).HasColumnName("kvkk_consent");
             entity.Property(e => e.CreatedAt).HasColumnName("created_at");
             entity.Property(e => e.UpdatedAt).HasColumnName("updated_at");
+            entity.Property(e => e.TrackingToken).HasColumnName("tracking_token").HasMaxLength(64);
+            entity.Property(e => e.VehicleWorkStatus).HasColumnName("vehicle_work_status");
+            entity.Property(e => e.EstimatedCompletionAt).HasColumnName("estimated_completion_at");
+            entity.Property(e => e.TrackingNote).HasColumnName("tracking_note").HasMaxLength(500);
+            entity.Property(e => e.VehicleReceivedAt).HasColumnName("vehicle_received_at");
+            entity.Property(e => e.WorkStartedAt).HasColumnName("work_started_at");
+            entity.Property(e => e.ReadyAt).HasColumnName("ready_at");
+            entity.Property(e => e.DeliveredAt).HasColumnName("delivered_at");
 
             entity.HasIndex(e => new { e.Date, e.TimeSlot });
             entity.HasIndex(e => e.Status);
             entity.HasIndex(e => e.Phone);
+            entity.HasIndex(e => e.TrackingToken).IsUnique();
 
             entity.HasOne(e => e.Service)
                 .WithMany(s => s.Appointments)

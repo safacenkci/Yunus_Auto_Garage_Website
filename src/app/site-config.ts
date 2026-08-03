@@ -139,7 +139,6 @@ export const SITE_CONFIG = {
   META_TITLE: 'Yunus Auto Garage | Aksaray Oto Servis',
   META_DESCRIPTION:
     'Aksaray sanayi sitesinde elektronik arıza, klima dolumu ve oto tuning. İlk randevunuzda %20 indirim. Hemen arayın: 0536 239 29 68.',
-  FOOTER_TAGLINE: 'Modern Mühendislik, Profesyonel Hizmet.',
 } as const;
 
 /** Ana sayfa navbar / footer bölüm linkleri (fragment id = label eşleşmesi). */

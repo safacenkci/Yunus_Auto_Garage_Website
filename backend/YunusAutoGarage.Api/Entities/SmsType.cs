@@ -5,5 +5,6 @@ public enum SmsType
     AdminNotification,
     CustomerConfirmation,
     Reminder,
-    Bulk
+    Bulk,
+    TrackingUpdate
 }

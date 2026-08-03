@@ -13,8 +13,8 @@
   }
 </div>
 
-<div class="hidden md:block overflow-x-auto admin-section">
-  <table class="admin-table">
+<div class="hidden lg:block overflow-x-auto admin-section">
+  <table class="admin-table min-w-[1100px]">
     <thead class="admin-table-head">
       <tr>
         <th>Müşteri</th>
@@ -24,6 +24,8 @@
         <th>Detay</th>
         <th>Tarih/Saat</th>
         <th>Durum</th>
+        <th>Araç Durumu</th>
+        <th>Tahmini Bitiş</th>
         <th>İşlem</th>
       </tr>
     </thead>
@@ -31,12 +33,27 @@
       @for (apt of appointments(); track apt.id) {
         <tr>
           <td>{{ apt.fullName }}</td>
-          <td><a [href]="'tel:+90' + apt.phone" class="hover:text-primary">{{ apt.phone }}</a></td>
-          <td>{{ apt.vehicleMake }} {{ apt.vehicleModel }}</td>
+          <td><a [href]="phoneTelHref(apt.phone)" class="hover:text-primary">{{ formatPhoneDisplay(apt.phone) }}</a></td>
+          <td>
+            {{ apt.vehicleMake }} {{ apt.vehicleModel }}
+            @if (apt.vehicleYear) { ({{ apt.vehicleYear }}) }
+          </td>
           <td>{{ apt.serviceName }}</td>
           <td class="max-w-xs truncate" [title]="apt.note ?? ''">{{ apt.note ?? '—' }}</td>
           <td>{{ apt.date }} {{ apt.timeSlot }}</td>
           <td><span class="admin-badge" [class]="statusClass(apt.status)">{{ statusLabel(apt.status) }}</span></td>
+          <td>
+            <span class="admin-badge" [class]="workStatusClass(apt.vehicleWorkStatus)">
+              {{ workStatusLabel(apt.vehicleWorkStatus) }}
+            </span>
+          </td>
+          <td>
+            @if (apt.estimatedCompletionAt) {
+              {{ apt.estimatedCompletionAt | date: 'dd.MM.yyyy HH:mm' }}
+            } @else {
+              —
+            }
+          </td>
           <td>
             <div class="flex flex-wrap gap-xs">
               @if (apt.status === 'Pending') {
@@ -47,6 +64,9 @@
                 <button type="button" (click)="askStatusChange(apt.id, 'Completed', 'Tamamlandı', 'secondary')" class="admin-btn admin-btn--outline admin-btn--sm">Tamamlandı</button>
                 <button type="button" (click)="askStatusChange(apt.id, 'NoShow', 'Gelmedi', 'danger')" class="admin-btn admin-btn--danger admin-btn--sm">Gelmedi</button>
               }
+              @if (canEditTracking(apt)) {
+                <button type="button" (click)="openTracking(apt)" class="admin-btn admin-btn--outline admin-btn--sm">Takip</button>
+              }
             </div>
           </td>
         </tr>
@@ -55,17 +75,30 @@
   </table>
 </div>
 
-<div class="md:hidden grid grid-cols-1 sm:grid-cols-2 gap-md admin-section">
+<div class="lg:hidden grid grid-cols-1 sm:grid-cols-2 gap-md admin-section">
   @for (apt of appointments(); track apt.id) {
     <div class="admin-card">
       <p class="font-body-md font-bold">{{ apt.fullName }}</p>
-      <p class="font-label-sm"><a [href]="'tel:+90' + apt.phone">{{ apt.phone }}</a></p>
-      <p class="font-label-sm">{{ apt.vehicleMake }} {{ apt.vehicleModel }}</p>
+      <p class="font-label-sm"><a [href]="phoneTelHref(apt.phone)">{{ formatPhoneDisplay(apt.phone) }}</a></p>
+      <p class="font-label-sm">
+        {{ apt.vehicleMake }} {{ apt.vehicleModel }}
+        @if (apt.vehicleYear) { ({{ apt.vehicleYear }}) }
+      </p>
       <p class="font-label-sm">{{ apt.serviceName }} — {{ apt.date }} {{ apt.timeSlot }}</p>
       @if (apt.note) {
         <p class="font-label-sm text-on-surface-variant mt-xs">{{ apt.note }}</p>
       }
-      <span class="admin-badge mt-xs" [class]="statusClass(apt.status)">{{ statusLabel(apt.status) }}</span>
+      <div class="flex flex-wrap gap-xs mt-xs">
+        <span class="admin-badge" [class]="statusClass(apt.status)">{{ statusLabel(apt.status) }}</span>
+        <span class="admin-badge" [class]="workStatusClass(apt.vehicleWorkStatus)">
+          {{ workStatusLabel(apt.vehicleWorkStatus) }}
+        </span>
+      </div>
+      @if (apt.estimatedCompletionAt) {
+        <p class="font-label-sm text-on-surface-variant mt-xs">
+          Tahmini bitiş: {{ apt.estimatedCompletionAt | date: 'dd.MM.yyyy HH:mm' }}
+        </p>
+      }
       <div class="flex flex-wrap gap-xs mt-sm">
         @if (apt.status === 'Pending') {
           <button type="button" (click)="askApprove(apt.id)" class="admin-btn admin-btn--secondary admin-btn--sm">Onayla</button>
@@ -74,6 +107,9 @@
         @if (apt.status === 'Confirmed') {
           <button type="button" (click)="askStatusChange(apt.id, 'Completed', 'Tamamlandı', 'secondary')" class="admin-btn admin-btn--outline admin-btn--sm">Tamamlandı</button>
           <button type="button" (click)="askStatusChange(apt.id, 'NoShow', 'Gelmedi', 'danger')" class="admin-btn admin-btn--danger admin-btn--sm">Gelmedi</button>
+        }
+        @if (canEditTracking(apt)) {
+          <button type="button" (click)="openTracking(apt)" class="admin-btn admin-btn--outline admin-btn--sm">Takip</button>
         }
       </div>
     </div>
@@ -91,4 +127,73 @@
     (cancelled)="closeConfirm()"
     (confirmed)="submitConfirm()"
   />
+}
+
+@if (trackingAppointment(); as apt) {
+  <div class="admin-modal-backdrop" (click)="closeTracking()" role="presentation">
+    <div
+      class="admin-modal admin-modal--wide relative"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="tracking-modal-title"
+      (click)="$event.stopPropagation()"
+    >
+      <h2 id="tracking-modal-title" class="admin-section-title">Araç Takibi — {{ apt.fullName }}</h2>
+      <p class="font-label-sm text-on-surface-variant mb-md">
+        {{ apt.vehicleMake }} {{ apt.vehicleModel }}
+        @if (apt.vehicleYear) { ({{ apt.vehicleYear }}) }
+        · {{ apt.date }} {{ apt.timeSlot }}
+      </p>
+      <p class="font-label-sm text-on-surface-variant mb-md">
+        Kaydettiğinizde müşteriye otomatik SMS gönderilir.
+      </p>
+
+      <form class="flex flex-col gap-md" [formGroup]="trackingForm" (ngSubmit)="saveTracking()">
+        <label class="flex flex-col gap-xs">
+          <span class="font-label-sm font-bold">Araç durumu</span>
+          <select class="admin-input" formControlName="vehicleWorkStatus">
+            @for (opt of workStatusOptions; track opt.value) {
+              <option [value]="opt.value">{{ opt.label }}</option>
+            }
+          </select>
+        </label>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-md">
+          <label class="flex flex-col gap-xs">
+            <span class="font-label-sm font-bold">Tahmini bitiş tarihi</span>
+            <div class="input-shell">
+              <input type="date" class="admin-input" formControlName="estimatedDate" />
+            </div>
+          </label>
+          <label class="flex flex-col gap-xs">
+            <span class="font-label-sm font-bold">Tahmini bitiş saati</span>
+            <div class="input-shell">
+              <input type="time" class="admin-input" formControlName="estimatedTime" />
+            </div>
+          </label>
+        </div>
+
+        <label class="flex flex-col gap-xs">
+          <span class="font-label-sm font-bold">Müşteri notu (opsiyonel)</span>
+          <textarea class="admin-input" rows="3" formControlName="trackingNote" maxlength="500"></textarea>
+        </label>
+
+        @if (trackingError()) {
+          <p class="font-label-sm text-error">{{ trackingError() }}</p>
+        }
+        @if (trackingSaved()) {
+          <p class="font-label-sm text-secondary">Müşteriye SMS gönderildi.</p>
+        }
+
+        <div class="flex flex-col-reverse sm:flex-row flex-wrap gap-sm justify-end mt-sm">
+          <button type="button" class="admin-btn admin-btn--outline w-full sm:w-auto" (click)="closeTracking()" [disabled]="trackingSaving()">
+            İptal
+          </button>
+          <button type="submit" class="admin-btn admin-btn--primary w-full sm:w-auto" [disabled]="trackingSaving()">
+            @if (trackingSaving()) { Kaydediliyor… } @else { Kaydet ve SMS Gönder }
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
 }

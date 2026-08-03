@@ -10,12 +10,28 @@ export interface SlotDto {
   available: boolean;
 }
 
+export interface VehicleCategoryDto {
+  id: string;
+  name: string;
+}
+
+export interface VehicleMakeDto {
+  id: number;
+  name: string;
+}
+
+export interface VehicleModelDto {
+  id: number;
+  name: string;
+}
+
 export interface CreateAppointmentRequest {
   fullName: string;
   phone: string;
   serviceId: number;
   vehicleMake: string;
   vehicleModel: string;
+  vehicleYear: number;
   date: string;
   timeSlot: string;
   note?: string;
@@ -29,6 +45,7 @@ export interface AppointmentResponse {
   phone: string;
   vehicleMake: string;
   vehicleModel: string;
+  vehicleYear: number | null;
   licensePlate: string | null;
   serviceId: number;
   serviceName: string;
@@ -37,6 +54,40 @@ export interface AppointmentResponse {
   note: string | null;
   status: string;
   createdAt: string;
+  trackingToken: string;
+  vehicleWorkStatus: string;
+  estimatedCompletionAt: string | null;
+  trackingNote: string | null;
+}
+
+export interface UpdateVehicleTrackingRequest {
+  vehicleWorkStatus: string;
+  estimatedCompletionAt?: string | null;
+  trackingNote?: string | null;
+}
+
+export interface TrackingTimelineStepDto {
+  status: string;
+  label: string;
+  completedAt: string | null;
+  isCurrent: boolean;
+  isCompleted: boolean;
+}
+
+export interface TrackingResponse {
+  vehicleMake: string;
+  vehicleModel: string;
+  vehicleYear: number | null;
+  licensePlate: string | null;
+  serviceName: string;
+  appointmentDate: string;
+  timeSlot: string;
+  appointmentStatus: string;
+  vehicleWorkStatus: string;
+  vehicleWorkStatusLabel: string;
+  estimatedCompletionAt: string | null;
+  trackingNote: string | null;
+  timeline: TrackingTimelineStepDto[];
 }
 
 export interface LoginResponse {

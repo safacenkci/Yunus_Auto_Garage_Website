@@ -17,6 +17,8 @@
           <a
             [href]="banner.ctaLink || '/randevu'"
             class="font-bold underline underline-offset-2 hover:no-underline touch-target inline-flex items-center"
+            [attr.target]="isExternalHttpLink(banner.ctaLink) ? '_blank' : null"
+            [attr.rel]="isExternalHttpLink(banner.ctaLink) ? 'noopener noreferrer' : null"
           >
             {{ banner.ctaText }}
           </a>
@@ -29,11 +31,12 @@
     class="bg-surface/80 dark:bg-inverse-surface/80 backdrop-blur-xl w-full border-b border-outline-variant/30 shadow-sm glass-nav"
     aria-label="Ana menü"
   >
-    <div data-header-nav class="page-container flex justify-between items-center h-16 md:h-20">
-      <div class="flex items-center gap-sm">
+    <div data-header-nav class="page-container flex justify-between items-center h-16 md:h-20 gap-sm">
+      <div class="flex items-center gap-sm min-w-0">
         <a
-          class="font-headline-md text-headline-md font-bold tracking-tight text-primary dark:text-primary-fixed-dim"
+          class="font-headline-md text-lg md:text-headline-md font-bold tracking-tight text-primary dark:text-primary-fixed-dim min-w-0 truncate"
           routerLink="/"
+          (click)="navigateToTop($event)"
         >
           {{ config.BUSINESS_NAME }}
         </a>
@@ -49,7 +52,7 @@
           </a>
         }
       </div>
-      <div class="flex items-center gap-md">
+      <div class="flex items-center gap-md shrink-0">
         <div class="hidden md:flex items-center gap-xs mr-sm">
           <span class="font-headline-md text-body-lg font-bold text-primary">{{
             config.PHONE_DISPLAY
@@ -90,32 +93,77 @@
       </div>
     </div>
 
-    @if (mobileMenuOpen()) {
-      <div
-        id="mobile-menu"
-        class="md:hidden border-t border-outline-variant/30 bg-surface-container-lowest px-lg py-md flex flex-col gap-xs"
-      >
-        @for (section of navSections; track section.id) {
-          <a
-            class="font-body-md text-body-md text-on-surface-variant touch-target flex items-center"
-            [href]="'/#' + section.id"
-            (click)="navigateToSection($event, section.id)"
-          >
-            {{ section.label }}
-          </a>
-        }
-        <a [href]="phoneHref" class="font-body-md text-body-md text-primary font-bold touch-target flex items-center" (click)="closeMobileMenu()">{{ config.PHONE_DISPLAY }}</a>
-        <a [href]="whatsappHref" target="_blank" rel="noopener" class="flex items-center gap-xs font-body-md text-body-md text-primary touch-target" (click)="closeMobileMenu()">
-          <span class="material-symbols-outlined text-xl">chat</span> WhatsApp
-        </a>
-        <a
-          routerLink="/randevu"
-          class="flex items-center justify-center touch-target px-md py-sm bg-gradient-to-r from-secondary-container to-secondary-fixed-dim text-on-secondary-container font-label-md rounded-lg mt-xs"
-          (click)="closeMobileMenu()"
-        >
-          Randevu Al — %{{ config.PROMO_DISCOUNT_PERCENT }} İndirim
-        </a>
-      </div>
-    }
   </nav>
+
+  <!-- Mobile side drawer -->
+  <div
+    class="md:hidden fixed inset-0 z-[10040] bg-black/40 transition-opacity duration-300 overscroll-none"
+    [class.opacity-100]="mobileMenuOpen()"
+    [class.opacity-0]="!mobileMenuOpen()"
+    [class.pointer-events-none]="!mobileMenuOpen()"
+    [attr.aria-hidden]="!mobileMenuOpen()"
+    (click)="closeMobileMenu()"
+  ></div>
+  <aside
+    id="mobile-menu"
+    class="md:hidden fixed top-0 right-0 z-[10050] h-dvh max-h-dvh w-[min(20rem,85vw)] bg-surface-container-lowest border-l border-outline-variant/30 shadow-premium flex flex-col transition-transform duration-300 ease-out overscroll-contain"
+    [class.translate-x-0]="mobileMenuOpen()"
+    [class.translate-x-full]="!mobileMenuOpen()"
+    [class.pointer-events-none]="!mobileMenuOpen()"
+    [attr.aria-hidden]="!mobileMenuOpen()"
+    role="dialog"
+    aria-modal="true"
+    aria-label="Mobil menü"
+  >
+    <div class="flex items-center justify-between px-lg h-16 border-b border-outline-variant/30">
+      <span class="font-headline-md text-headline-sm font-bold text-primary">Menü</span>
+      <button
+        type="button"
+        class="flex items-center justify-center touch-target text-primary"
+        (click)="closeMobileMenu()"
+        aria-label="Menüyü kapat"
+      >
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </div>
+    <nav class="flex-1 overflow-y-auto px-lg py-md flex flex-col gap-xs" aria-label="Mobil menü bağlantıları">
+      @for (section of navSections; track section.id) {
+        <a
+          class="font-body-md text-body-md text-on-surface-variant hover:text-primary touch-target flex items-center px-sm rounded-lg hover:bg-surface-container-low"
+          [href]="'/#' + section.id"
+          (click)="navigateToSection($event, section.id)"
+        >
+          {{ section.label }}
+        </a>
+      }
+      <div class="border-t border-outline-variant/30 my-sm"></div>
+      <a
+        [href]="phoneHref"
+        class="font-body-md text-body-md text-primary font-bold touch-target flex items-center gap-xs px-sm"
+        (click)="closeMobileMenu()"
+      >
+        <span class="material-symbols-outlined text-xl">call</span>
+        {{ config.PHONE_DISPLAY }}
+      </a>
+      <a
+        [href]="whatsappHref"
+        target="_blank"
+        rel="noopener"
+        class="flex items-center gap-xs font-body-md text-body-md text-primary touch-target px-sm"
+        (click)="closeMobileMenu()"
+      >
+        <span class="material-symbols-outlined text-xl">chat</span>
+        WhatsApp
+      </a>
+    </nav>
+    <div class="px-lg py-md border-t border-outline-variant/30 pb-[max(1rem,env(safe-area-inset-bottom))]">
+      <a
+        routerLink="/randevu"
+        class="flex items-center justify-center touch-target px-md py-sm bg-gradient-to-r from-secondary-container to-secondary-fixed-dim text-on-secondary-container font-label-md rounded-lg"
+        (click)="closeMobileMenu()"
+      >
+        Randevu Al — %{{ config.PROMO_DISCOUNT_PERCENT }} İndirim
+      </a>
+    </div>
+  </aside>
 </header>

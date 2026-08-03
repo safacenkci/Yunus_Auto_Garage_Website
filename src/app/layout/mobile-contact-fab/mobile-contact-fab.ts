@@ -17,11 +17,16 @@ import { SITE_CONFIG } from '../../site-config';
         position: fixed;
         right: 1rem;
         bottom: calc(1rem + env(safe-area-inset-bottom, 0px));
-        z-index: 9999;
+        z-index: 40;
         display: flex;
         flex-direction: column;
         gap: 0.75rem;
         pointer-events: none;
+      }
+
+      :host-context(body.mobile-menu-open),
+      :host-context(body.lightbox-open) {
+        display: none !important;
       }
 
       @media (min-width: 768px) {

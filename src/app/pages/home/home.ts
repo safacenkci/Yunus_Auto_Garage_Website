@@ -79,11 +79,19 @@ export class HomeComponent {
     } else {
       this.lightboxEmbedUrl.set(null);
     }
+    if (typeof document !== 'undefined') {
+      document.body.style.overflow = 'hidden';
+      document.body.classList.add('lightbox-open');
+    }
   }
 
   closeLightbox() {
     this.lightboxItem.set(null);
     this.lightboxEmbedUrl.set(null);
+    if (typeof document !== 'undefined') {
+      document.body.style.overflow = '';
+      document.body.classList.remove('lightbox-open');
+    }
   }
 
   isEmbedVideo(item: GalleryItemDto): boolean {

@@ -7,6 +7,7 @@ public class Appointment
     public string Phone { get; set; } = string.Empty;
     public string VehicleMake { get; set; } = string.Empty;
     public string VehicleModel { get; set; } = string.Empty;
+    public int? VehicleYear { get; set; }
     public string? LicensePlate { get; set; }
     public int ServiceId { get; set; }
     public Service Service { get; set; } = null!;
@@ -17,4 +18,13 @@ public class Appointment
     public bool KvkkConsent { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
+
+    public string TrackingToken { get; set; } = string.Empty;
+    public VehicleWorkStatus VehicleWorkStatus { get; set; } = VehicleWorkStatus.None;
+    public DateTime? EstimatedCompletionAt { get; set; }
+    public string? TrackingNote { get; set; }
+    public DateTime? VehicleReceivedAt { get; set; }
+    public DateTime? WorkStartedAt { get; set; }
+    public DateTime? ReadyAt { get; set; }
+    public DateTime? DeliveredAt { get; set; }
 }

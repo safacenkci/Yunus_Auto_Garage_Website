@@ -10,6 +10,7 @@ import {
   PromoBannerAdminDto,
   SmsLogDto,
   UpdatePromoBannerRequest,
+  UpdateVehicleTrackingRequest,
 } from '../models/api.models';
 
 @Injectable({ providedIn: 'root' })
@@ -29,6 +30,10 @@ export class AdminApiService {
 
   updateStatus(id: string, status: string) {
     return this.api.patch<AppointmentResponse>(`/admin/appointments/${id}/status`, { status });
+  }
+
+  updateTracking(id: string, request: UpdateVehicleTrackingRequest) {
+    return this.api.patch<AppointmentResponse>(`/admin/appointments/${id}/tracking`, request);
   }
 
   getAnalytics(from?: string, to?: string) {

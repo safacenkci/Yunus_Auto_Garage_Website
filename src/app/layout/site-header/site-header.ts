@@ -34,6 +34,7 @@ export class SiteHeader implements AfterViewInit, OnDestroy {
   readonly whatsappHref = `https://wa.me/90${SITE_CONFIG.WHATSAPP_DIGITS}?text=Merhaba%2C%20oto%20elektrik%20hizmeti%20i%C3%A7in%20yard%C4%B1m%20istiyorum.`;
   readonly mobileMenuOpen = signal(false);
   readonly promo = signal<PromoBannerDto | null>(null);
+  private lockedScrollY = 0;
 
   constructor() {
     afterNextRender(() => {
@@ -48,22 +49,49 @@ export class SiteHeader implements AfterViewInit, OnDestroy {
   }
 
   isInternalLink(link: string | null | undefined): boolean {
-    return !!link && link.startsWith('/');
+    return !!link && link.startsWith('/') && !link.startsWith('//');
+  }
+
+  isExternalHttpLink(link: string | null | undefined): boolean {
+    if (!link) return false;
+    return /^https?:\/\//i.test(link);
   }
 
   toggleMobileMenu() {
-    const next = !this.mobileMenuOpen();
-    this.mobileMenuOpen.set(next);
-    if (isPlatformBrowser(this.platformId)) {
-      document.body.style.overflow = next ? 'hidden' : '';
-    }
+    this.setMobileMenuOpen(!this.mobileMenuOpen());
   }
 
   closeMobileMenu() {
-    this.mobileMenuOpen.set(false);
-    if (isPlatformBrowser(this.platformId)) {
-      document.body.style.overflow = '';
+    this.setMobileMenuOpen(false);
+  }
+
+  private setMobileMenuOpen(open: boolean) {
+    if (this.mobileMenuOpen() === open) return;
+    this.mobileMenuOpen.set(open);
+    if (!isPlatformBrowser(this.platformId)) return;
+
+    document.body.classList.toggle('mobile-menu-open', open);
+
+    if (open) {
+      this.lockedScrollY = window.scrollY;
+      document.documentElement.style.overflow = 'hidden';
+      document.body.style.overflow = 'hidden';
+      document.body.style.position = 'fixed';
+      document.body.style.top = `-${this.lockedScrollY}px`;
+      document.body.style.left = '0';
+      document.body.style.right = '0';
+      document.body.style.width = '100%';
+      return;
     }
+
+    document.documentElement.style.overflow = '';
+    document.body.style.overflow = '';
+    document.body.style.position = '';
+    document.body.style.top = '';
+    document.body.style.left = '';
+    document.body.style.right = '';
+    document.body.style.width = '';
+    window.scrollTo(0, this.lockedScrollY);
   }
 
   menuToggleLabel(): string {
@@ -88,12 +116,19 @@ export class SiteHeader implements AfterViewInit, OnDestroy {
 
   ngOnDestroy() {
     this.resizeObserver?.disconnect();
+    this.closeMobileMenu();
   }
 
   navigateToSection(event: Event, fragment: string) {
     event.preventDefault();
     this.closeMobileMenu();
     this.scrollService.navigateToHomeSection(fragment);
+  }
+
+  navigateToTop(event: Event) {
+    event.preventDefault();
+    this.closeMobileMenu();
+    this.scrollService.navigateToTop();
   }
 
   private syncHeaderHeight() {

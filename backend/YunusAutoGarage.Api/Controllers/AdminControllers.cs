@@ -70,6 +70,28 @@ public class AdminAppointmentsController(AdminService adminService) : Controller
         }
     }
 
+    [HttpPatch("appointments/{id:guid}/tracking")]
+    public async Task<ActionResult<AppointmentResponse>> UpdateTracking(
+        Guid id,
+        [FromBody] UpdateVehicleTrackingRequest request,
+        CancellationToken ct)
+    {
+        try
+        {
+            var result = await adminService.UpdateTrackingAsync(id, request, ct);
+            if (result is null)
+            {
+                return NotFound();
+            }
+
+            return Ok(result);
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(Problem(title: "Validasyon hatası", detail: ex.Message));
+        }
+    }
+
     [HttpGet("dashboard/summary")]
     public async Task<ActionResult<DashboardSummaryDto>> GetSummary(CancellationToken ct)
     {

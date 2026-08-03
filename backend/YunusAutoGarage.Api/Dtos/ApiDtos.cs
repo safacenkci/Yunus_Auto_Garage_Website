@@ -10,6 +10,7 @@ public record CreateAppointmentRequest(
     int ServiceId,
     string VehicleMake,
     string VehicleModel,
+    int VehicleYear,
     string Date,
     string TimeSlot,
     string? Note,
@@ -23,6 +24,7 @@ public record AppointmentResponse(
     string Phone,
     string VehicleMake,
     string VehicleModel,
+    int? VehicleYear,
     string? LicensePlate,
     int ServiceId,
     string ServiceName,
@@ -30,7 +32,41 @@ public record AppointmentResponse(
     string TimeSlot,
     string? Note,
     string Status,
-    DateTime CreatedAt
+    DateTime CreatedAt,
+    string TrackingToken,
+    string VehicleWorkStatus,
+    DateTime? EstimatedCompletionAt,
+    string? TrackingNote
+);
+
+public record UpdateVehicleTrackingRequest(
+    string VehicleWorkStatus,
+    DateTime? EstimatedCompletionAt,
+    string? TrackingNote
+);
+
+public record TrackingTimelineStepDto(
+    string Status,
+    string Label,
+    DateTime? CompletedAt,
+    bool IsCurrent,
+    bool IsCompleted
+);
+
+public record TrackingResponse(
+    string VehicleMake,
+    string VehicleModel,
+    int? VehicleYear,
+    string? LicensePlate,
+    string ServiceName,
+    string AppointmentDate,
+    string TimeSlot,
+    string AppointmentStatus,
+    string VehicleWorkStatus,
+    string VehicleWorkStatusLabel,
+    DateTime? EstimatedCompletionAt,
+    string? TrackingNote,
+    IReadOnlyList<TrackingTimelineStepDto> Timeline
 );
 
 public record LoginRequest(string Username, string Password);
@@ -108,3 +144,9 @@ public record UpdatePromoBannerRequest(
     string? CtaText,
     string? CtaLink
 );
+
+public record VehicleCategoryDto(string Id, string Name);
+
+public record VehicleMakeDto(int Id, string Name);
+
+public record VehicleModelDto(int Id, string Name);

@@ -22,10 +22,10 @@ public class NetgsmSmsService(
         return SendAsync([_options.AdminPhone], message, SmsType.AdminNotification, ct);
     }
 
-    public Task SendCustomerConfirmationAsync(Appointment appointment, CancellationToken ct = default)
+    public Task SendCustomerConfirmationAsync(Appointment appointment, string trackingUrl, CancellationToken ct = default)
     {
         var message =
-            $"Sayın {appointment.FullName}, {appointment.Date:dd.MM.yyyy} {appointment.TimeSlot} randevunuz onaylanmıştır. Yunus Auto Garage";
+            $"Sayın {appointment.FullName}, {appointment.Date:dd.MM.yyyy} {appointment.TimeSlot} randevunuz onaylanmıştır. Araç durumunuzu takip edin: {trackingUrl} Yunus Auto Garage";
         return SendAsync([appointment.Phone], message, SmsType.CustomerConfirmation, ct);
     }
 
@@ -34,6 +34,39 @@ public class NetgsmSmsService(
         var message =
             $"Sayın {appointment.FullName}, yarın {appointment.TimeSlot} randevunuz bulunmaktadır. Yunus Auto Garage";
         return SendAsync([appointment.Phone], message, SmsType.Reminder, ct);
+    }
+
+    public Task SendTrackingUpdateAsync(Appointment appointment, string trackingUrl, CancellationToken ct = default)
+    {
+        var statusLabel = TrackingService.StatusLabel(appointment.VehicleWorkStatus);
+        var eta = appointment.EstimatedCompletionAt.HasValue
+            ? FormatIstanbul(appointment.EstimatedCompletionAt.Value)
+            : "—";
+        var message =
+            $"Sayın {appointment.FullName}, aracınızın durumu: {statusLabel}. Tahmini bitiş: {eta} Detay: {trackingUrl} Yunus Auto Garage";
+        return SendAsync([appointment.Phone], message, SmsType.TrackingUpdate, ct);
+    }
+
+    private static string FormatIstanbul(DateTime utcOrUnspecified)
+    {
+        var utc = utcOrUnspecified.Kind switch
+        {
+            DateTimeKind.Utc => utcOrUnspecified,
+            DateTimeKind.Local => utcOrUnspecified.ToUniversalTime(),
+            _ => DateTime.SpecifyKind(utcOrUnspecified, DateTimeKind.Utc)
+        };
+
+        TimeZoneInfo tz;
+        try
+        {
+            tz = TimeZoneInfo.FindSystemTimeZoneById("Turkey Standard Time");
+        }
+        catch (TimeZoneNotFoundException)
+        {
+            tz = TimeZoneInfo.FindSystemTimeZoneById("Europe/Istanbul");
+        }
+
+        return TimeZoneInfo.ConvertTimeFromUtc(utc, tz).ToString("dd.MM.yyyy HH:mm");
     }
 
     public async Task<(bool Success, string ResultCode, int RecipientCount)> SendBulkAsync(

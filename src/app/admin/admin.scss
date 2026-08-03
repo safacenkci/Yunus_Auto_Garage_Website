@@ -176,6 +176,14 @@
   font-size: 12px;
 }
 
+@media (max-width: 767px) {
+  .admin-btn--sm {
+    min-height: 44px;
+    padding: 0 14px;
+    font-size: 14px;
+  }
+}
+
 .admin-badge {
   display: inline-flex;
   align-items: center;
@@ -209,6 +217,36 @@
   background: #ffdad6;
   border-color: #ba1a1a;
   color: #93000a;
+}
+
+.admin-badge--work-none {
+  background: #e6e8ea;
+  border-color: #76777d;
+  color: #191c1e;
+}
+
+.admin-badge--work-received {
+  background: #dae2fd;
+  border-color: #565e74;
+  color: #131b2e;
+}
+
+.admin-badge--work-progress {
+  background: #fccc38;
+  border-color: #755b00;
+  color: #241a00;
+}
+
+.admin-badge--work-ready {
+  background: #c8efd0;
+  border-color: #2e6b3a;
+  color: #0d2814;
+}
+
+.admin-badge--work-delivered {
+  background: #d4edda;
+  border-color: #1e5c2e;
+  color: #0d2814;
 }
 
 .admin-table {
@@ -303,10 +341,12 @@
   backdrop-filter: blur(4px);
   -webkit-backdrop-filter: blur(4px);
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
-  z-index: 50;
-  padding: 24px;
+  z-index: 60;
+  padding: 16px 16px calc(16px + env(safe-area-inset-bottom, 0px));
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .admin-modal {
@@ -316,7 +356,25 @@
   border: 1px solid rgba(198, 198, 205, 0.4);
   max-width: min(28rem, calc(100vw - 2rem));
   width: 100%;
+  margin: auto 0;
+  max-height: min(90dvh, calc(100dvh - 2rem));
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
   box-shadow: 0 10px 30px rgba(15, 23, 42, 0.12);
+}
+
+.admin-modal--wide {
+  max-width: min(36rem, calc(100vw - 2rem));
+}
+
+@media (max-width: 767px) {
+  .admin-modal .flex.justify-end {
+    flex-direction: column-reverse;
+  }
+
+  .admin-modal .flex.justify-end > .admin-btn {
+    width: 100%;
+  }
 }
 
 .admin-skeleton {
@@ -342,6 +400,11 @@
   overflow: hidden;
 }
 
+.admin-segment.w-full {
+  display: flex;
+  width: 100%;
+}
+
 .admin-segment-btn {
   min-height: 44px;
   padding: 0 20px;
@@ -363,20 +426,30 @@
   color: #241a00;
 }
 
+input.admin-input,
+select.admin-input,
+textarea.admin-input,
 .admin-input {
   width: 100%;
   min-height: 44px;
   margin-top: 4px;
   padding: 12px;
-  border-radius: 0.75rem;
+  border-radius: 0.75rem !important;
   border: 1px solid rgba(198, 198, 205, 0.6);
   background: #ffffff;
   font-size: 16px;
+  font-family: inherit;
+  color: #191c1e;
+  box-sizing: border-box;
 }
 
 .admin-input:focus {
   outline: 2px solid #000000;
   outline-offset: 1px;
+}
+
+.input-shell {
+  border-color: rgba(198, 198, 205, 0.6);
 }
 
 .admin-input--error {

@@ -1,6 +1,7 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, effect, inject, signal } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
+import { lockAdminOverlay } from '../shared/admin-overlay-lock';
 import {
   ADMIN_MOBILE_PRIMARY_ROUTES,
   ADMIN_NAV_GROUPS,
@@ -21,6 +22,13 @@ export class AdminLayout {
   );
 
   readonly mobileMenuOpen = signal(false);
+
+  constructor() {
+    effect((onCleanup) => {
+      if (!this.mobileMenuOpen()) return;
+      onCleanup(lockAdminOverlay());
+    });
+  }
 
   logout() {
     this.auth.clearToken();

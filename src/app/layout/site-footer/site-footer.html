@@ -7,7 +7,7 @@
       {{ config.BUSINESS_NAME }}
     </div>
     <div class="font-label-md text-label-md text-on-surface-variant text-center md:text-left">
-      &copy; {{ currentYear }} {{ config.BUSINESS_NAME }}. {{ config.FOOTER_TAGLINE }}
+      &copy; {{ currentYear }} {{ config.BUSINESS_NAME }}.
     </div>
     <div class="flex flex-wrap justify-center gap-md font-label-md text-label-md text-on-surface-variant">
       @for (section of navSections; track section.id) {
@@ -24,6 +24,12 @@
         routerLink="/randevu"
       >
         Randevu Al
+      </a>
+      <a
+        class="hover:underline hover:text-primary transition-all touch-target inline-flex items-center"
+        routerLink="/kvkk"
+      >
+        KVKK
       </a>
     </div>
   </div>

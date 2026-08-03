@@ -1,144 +1,148 @@
-<h1 class="admin-page-title">Ayarlar</h1>
-
-<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-lg admin-section items-start">
-  <section class="admin-card flex flex-col gap-md h-full">
-    <h2 class="admin-section-title admin-section-title--inset">Promosyon Banner</h2>
-    <form [formGroup]="promoForm" class="flex flex-col gap-md flex-1" novalidate>
-      @if (promoSubmitted() && promoForm.invalid) {
-        <div class="admin-form-error-banner" role="alert">{{ formSummary }}</div>
-      }
-      <label class="flex items-center gap-sm cursor-pointer">
-        <input type="checkbox" formControlName="isEnabled" />
-        Banner görünür
-      </label>
-      <div>
-        <label for="promoMessage" class="font-label-md">Banner metni</label>
-        <textarea
-          id="promoMessage"
-          formControlName="messageText"
-          rows="3"
-          class="admin-input"
-          [class.admin-input--error]="promoFieldInvalid('messageText')"
-          placeholder="İlk randevunuzda %20 indirim fırsatı —"
-        ></textarea>
-        @if (promoFieldError('messageText'); as err) {
-          <p class="admin-field-error" role="alert">{{ err }}</p>
-        }
-        <p class="font-label-sm text-on-surface-variant mt-xs">
-          Üst şeritte görünen ana metin. CTA butonu ayrı alanda tanımlanır.
-        </p>
-      </div>
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-md">
-        <div>
-          <label for="promoCtaText" class="font-label-md">Buton metni (opsiyonel)</label>
-          <input id="promoCtaText" formControlName="ctaText" class="admin-input" placeholder="Hemen randevu alın" />
-        </div>
-        <div>
-          <label for="promoCtaLink" class="font-label-md">Buton bağlantısı</label>
-          <input
-            id="promoCtaLink"
-            formControlName="ctaLink"
-            class="admin-input"
-            [class.admin-input--error]="promoFieldInvalid('ctaLink')"
-            placeholder="/randevu"
-          />
-          @if (promoFieldError('ctaLink'); as err) {
-            <p class="admin-field-error" role="alert">{{ err }}</p>
-          }
-        </div>
-      </div>
-      @if (promoError()) {
-        <p class="font-label-sm text-error">{{ promoError() }}</p>
-      }
-      @if (promoSaved()) {
-        <p class="font-label-sm text-primary">Kaydedildi.</p>
-      }
-      <button
-        type="button"
-        (click)="askSavePromo()"
-        [disabled]="promoSaving() || confirming()"
-        [class.admin-btn--loading]="promoSaving()"
-        class="admin-btn admin-btn--primary w-fit mt-auto"
-      >
-        @if (promoSaving()) {
-          <app-admin-button-spinner variant="light" />
-          Kaydediliyor…
-        } @else {
-          Banner kaydet
-        }
-      </button>
-    </form>
-  </section>
-
-  <section class="admin-card flex flex-col gap-md h-full">
-    <h2 class="admin-section-title admin-section-title--inset">Kapalı Gün/Slot</h2>
-    <form [formGroup]="form" class="flex flex-col gap-md flex-1" novalidate>
-      @if (blockedSubmitted() && form.invalid) {
-        <div class="admin-form-error-banner" role="alert">{{ formSummary }}</div>
-      }
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-md">
-        <div>
-          <label for="blockedDate" class="font-label-md">Tarih</label>
-          <input
-            id="blockedDate"
-            type="date"
-            formControlName="date"
-            class="admin-input"
-            [class.admin-input--error]="blockedFieldInvalid('date')"
-          />
-          @if (blockedFieldError('date'); as err) {
-            <p class="admin-field-error" role="alert">{{ err }}</p>
-          }
-        </div>
-        @if (!form.getRawValue().allDay) {
-          <div>
-            <label for="blockedTime" class="font-label-md">Saat (opsiyonel)</label>
-            <input id="blockedTime" formControlName="timeSlot" placeholder="10:00" class="admin-input" />
-          </div>
-        }
-      </div>
-      <label class="flex items-center gap-sm cursor-pointer">
-        <input type="checkbox" formControlName="allDay" /> Tüm günü kapat
-      </label>
-      <div>
-        <label for="blockedReason" class="font-label-md">Sebep (opsiyonel)</label>
-        <input id="blockedReason" formControlName="reason" class="admin-input" />
-      </div>
-      <button type="button" (click)="askAdd()" class="admin-btn admin-btn--primary w-fit mt-auto">Ekle</button>
-    </form>
-  </section>
-
-  <section class="admin-card flex flex-col gap-md h-full md:col-span-2 xl:col-span-1">
-    <h2 class="admin-section-title admin-section-title--inset">Mevcut Kapalı Günler</h2>
-    @if (blockedSlots().length === 0) {
-      <p class="font-body-md text-on-surface-variant">Henüz kapalı gün veya slot tanımlanmadı.</p>
-    } @else {
-      <div class="admin-compact-list flex-1">
-        @for (slot of blockedSlots(); track slot.id) {
-          <div class="admin-compact-list-item">
-            <div class="min-w-0">
-              <p class="font-body-md font-bold truncate">{{ slot.date }}</p>
-              <p class="font-label-sm text-on-surface-variant truncate">
-                @if (slot.timeSlot) { {{ slot.timeSlot }} } @else { Tüm gün }
-                @if (slot.reason) { — {{ slot.reason }} }
-              </p>
-            </div>
-            <button type="button" (click)="askRemove(slot.id)" class="admin-btn admin-btn--danger admin-btn--sm shrink-0">Sil</button>
-          </div>
-        }
-      </div>
-    }
-  </section>
-</div>
-
-@if (pendingConfirm()) {
-  <app-admin-confirm-modal
-    [open]="true"
-    [kind]="confirmKind()"
-    [confirmLabel]="confirmLabel()"
-    [confirmVariant]="confirmVariant()"
-    [loading]="confirming()"
-    (cancelled)="closeConfirm()"
-    (confirmed)="submitConfirm()"
-  />
-}
+<h1 class="admin-page-title">Ayarlar</h1>
+
+<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-lg admin-section items-start">
+  <section class="admin-card flex flex-col gap-md h-full">
+    <h2 class="admin-section-title admin-section-title--inset">Promosyon Banner</h2>
+    <form [formGroup]="promoForm" class="flex flex-col gap-md flex-1" novalidate>
+      @if (promoSubmitted() && promoForm.invalid) {
+        <div class="admin-form-error-banner" role="alert">{{ formSummary }}</div>
+      }
+      <label class="flex items-center gap-sm cursor-pointer">
+        <input type="checkbox" formControlName="isEnabled" />
+        Banner görünür
+      </label>
+      <div>
+        <label for="promoMessage" class="font-label-md">Banner metni</label>
+        <textarea
+          id="promoMessage"
+          formControlName="messageText"
+          rows="3"
+          class="admin-input"
+          [class.admin-input--error]="promoFieldInvalid('messageText')"
+          placeholder="İlk randevunuzda %20 indirim fırsatı —"
+        ></textarea>
+        @if (promoFieldError('messageText'); as err) {
+          <p class="admin-field-error" role="alert">{{ err }}</p>
+        }
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-md">
+        <div>
+          <label for="promoCtaText" class="font-label-md">Buton metni</label>
+          <input
+            id="promoCtaText"
+            formControlName="ctaText"
+            class="admin-input"
+            [class.admin-input--error]="promoFieldInvalid('ctaText')"
+            placeholder="Hemen randevu alın"
+          />
+          @if (promoFieldError('ctaText'); as err) {
+            <p class="admin-field-error" role="alert">{{ err }}</p>
+          }
+        </div>
+        <div>
+          <label for="promoCtaLink" class="font-label-md">Buton bağlantısı</label>
+          <input
+            id="promoCtaLink"
+            formControlName="ctaLink"
+            class="admin-input"
+            [class.admin-input--error]="promoFieldInvalid('ctaLink')"
+            placeholder="https://… veya /randevu veya tel:+90…"
+          />
+          @if (promoFieldError('ctaLink'); as err) {
+            <p class="admin-field-error" role="alert">{{ err }}</p>
+          }
+        </div>
+      </div>
+      @if (promoError()) {
+        <p class="font-label-sm text-error">{{ promoError() }}</p>
+      }
+      @if (promoSaved()) {
+        <p class="font-label-sm text-primary">Kaydedildi.</p>
+      }
+      <button
+        type="button"
+        (click)="askSavePromo()"
+        [disabled]="promoSaving() || confirming()"
+        [class.admin-btn--loading]="promoSaving()"
+        class="admin-btn admin-btn--primary w-fit mt-auto"
+      >
+        @if (promoSaving()) {
+          <app-admin-button-spinner variant="light" />
+          Kaydediliyor…
+        } @else {
+          Banner kaydet
+        }
+      </button>
+    </form>
+  </section>
+
+  <section class="admin-card flex flex-col gap-md h-full">
+    <h2 class="admin-section-title admin-section-title--inset">Kapalı Gün/Slot</h2>
+    <form [formGroup]="form" class="flex flex-col gap-md flex-1" novalidate>
+      @if (blockedSubmitted() && form.invalid) {
+        <div class="admin-form-error-banner" role="alert">{{ formSummary }}</div>
+      }
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-md">
+        <div>
+          <label for="blockedDate" class="font-label-md">Tarih</label>
+          <div class="input-shell" [class.input-shell--error]="blockedFieldInvalid('date')">
+            <input id="blockedDate" type="date" formControlName="date" class="admin-input" />
+          </div>
+          @if (blockedFieldError('date'); as err) {
+            <p class="admin-field-error" role="alert">{{ err }}</p>
+          }
+        </div>
+        @if (!form.getRawValue().allDay) {
+          <div>
+            <label for="blockedTime" class="font-label-md">Saat (opsiyonel)</label>
+            <div class="input-shell">
+              <input id="blockedTime" type="time" formControlName="timeSlot" class="admin-input" />
+            </div>
+          </div>
+        }
+      </div>
+      <label class="flex items-center gap-sm cursor-pointer">
+        <input type="checkbox" formControlName="allDay" /> Tüm günü kapat
+      </label>
+      <div>
+        <label for="blockedReason" class="font-label-md">Sebep (opsiyonel)</label>
+        <input id="blockedReason" formControlName="reason" class="admin-input" />
+      </div>
+      <button type="button" (click)="askAdd()" class="admin-btn admin-btn--primary w-fit mt-auto">Ekle</button>
+    </form>
+  </section>
+
+  <section class="admin-card flex flex-col gap-md h-full md:col-span-2 xl:col-span-1">
+    <h2 class="admin-section-title admin-section-title--inset">Mevcut Kapalı Günler</h2>
+    @if (blockedSlots().length === 0) {
+      <p class="font-body-md text-on-surface-variant">Henüz kapalı gün veya slot tanımlanmadı.</p>
+    } @else {
+      <div class="admin-compact-list flex-1">
+        @for (slot of blockedSlots(); track slot.id) {
+          <div class="admin-compact-list-item">
+            <div class="min-w-0">
+              <p class="font-body-md font-bold truncate">{{ slot.date }}</p>
+              <p class="font-label-sm text-on-surface-variant truncate">
+                @if (slot.timeSlot) { {{ slot.timeSlot }} } @else { Tüm gün }
+                @if (slot.reason) { — {{ slot.reason }} }
+              </p>
+            </div>
+            <button type="button" (click)="askRemove(slot.id)" class="admin-btn admin-btn--danger admin-btn--sm shrink-0">Sil</button>
+          </div>
+        }
+      </div>
+    }
+  </section>
+</div>
+
+@if (pendingConfirm()) {
+  <app-admin-confirm-modal
+    [open]="true"
+    [kind]="confirmKind()"
+    [confirmLabel]="confirmLabel()"
+    [confirmVariant]="confirmVariant()"
+    [loading]="confirming()"
+    (cancelled)="closeConfirm()"
+    (confirmed)="submitConfirm()"
+  />
+}

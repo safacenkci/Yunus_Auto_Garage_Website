@@ -168,6 +168,17 @@
         },
       };
     </script>
+    <!-- Tailwind forms plugin sets square inputs; restore rounded site fields -->
+    <style>
+      input.form-input,
+      select.form-input,
+      textarea.form-input,
+      input.admin-input,
+      select.admin-input,
+      textarea.admin-input {
+        border-radius: 0.75rem !important;
+      }
+    </style>
 
     <!-- ─── JSON-LD Yapısal Veri (AutoRepair schema.org) ──────── -->
     <script type="application/ld+json">

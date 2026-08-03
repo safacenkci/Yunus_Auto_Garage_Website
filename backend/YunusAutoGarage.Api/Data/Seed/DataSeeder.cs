@@ -41,10 +41,11 @@ public static class DataSeeder
         "Oto Boya"
     ];
 
-    public static async Task SeedAsync(AppDbContext db, IConfiguration configuration)
+    public static async Task SeedAsync(AppDbContext db, IConfiguration configuration, IWebHostEnvironment env)
     {
         await SyncServicesAsync(db);
         await SeedPromoBannerAsync(db);
+        await GallerySeeder.SeedAsync(db, env, configuration);
 
         if (!await db.AdminUsers.AnyAsync())
         {

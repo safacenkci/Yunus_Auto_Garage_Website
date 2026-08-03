@@ -36,7 +36,7 @@ public class AppointmentService(
 
         if (!PhoneNormalizer.IsValid(request.Phone))
         {
-            throw new ArgumentException("Geçerli bir Türk GSM numarası giriniz.");
+            throw new ArgumentException("Geçerli bir telefon numarası giriniz.");
         }
 
         if (!DateOnly.TryParse(request.Date, out var date))
@@ -91,6 +91,12 @@ public class AppointmentService(
             return null;
         }
 
+        var currentYear = DateTime.UtcNow.Year + 1;
+        if (request.VehicleYear < 1950 || request.VehicleYear > currentYear)
+        {
+            throw new ArgumentException($"Araç yılı 1950 ile {currentYear} arasında olmalıdır.");
+        }
+
         var now = DateTime.UtcNow;
         var appointment = new Appointment
         {
@@ -99,6 +105,7 @@ public class AppointmentService(
             Phone = PhoneNormalizer.Normalize(request.Phone),
             VehicleMake = request.VehicleMake.Trim(),
             VehicleModel = request.VehicleModel.Trim(),
+            VehicleYear = request.VehicleYear,
             LicensePlate = null,
             ServiceId = request.ServiceId,
             Date = date,
@@ -107,7 +114,9 @@ public class AppointmentService(
             Status = AppointmentStatus.Pending,
             KvkkConsent = true,
             CreatedAt = now,
-            UpdatedAt = now
+            UpdatedAt = now,
+            TrackingToken = TrackingService.GenerateTrackingToken(),
+            VehicleWorkStatus = VehicleWorkStatus.None
         };
 
         db.Appointments.Add(appointment);
@@ -135,6 +144,7 @@ public class AppointmentService(
             a.Phone,
             a.VehicleMake,
             a.VehicleModel,
+            a.VehicleYear,
             a.LicensePlate,
             a.ServiceId,
             serviceName,
@@ -142,7 +152,11 @@ public class AppointmentService(
             a.TimeSlot,
             a.Note,
             a.Status.ToString(),
-            a.CreatedAt
+            a.CreatedAt,
+            a.TrackingToken,
+            a.VehicleWorkStatus.ToString(),
+            a.EstimatedCompletionAt,
+            a.TrackingNote
         );
 
     private static DateOnly GetTodayInIstanbul()

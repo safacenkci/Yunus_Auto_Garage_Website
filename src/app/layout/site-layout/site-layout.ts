@@ -10,7 +10,7 @@ import { SiteHeader } from '../site-header/site-header';
   template: `
     <div class="bg-background text-on-background antialiased min-h-screen flex flex-col pt-[var(--header-height)]">
       <app-site-header />
-      <main class="flex-grow flex flex-col">
+      <main class="flex-grow flex flex-col pb-[calc(7.5rem+env(safe-area-inset-bottom))] md:pb-0">
         <router-outlet />
       </main>
       <app-site-footer />

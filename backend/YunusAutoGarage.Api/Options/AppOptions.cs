@@ -48,3 +48,10 @@ public class StorageOptions
     public string[] AllowedImageExtensions { get; set; } = [".jpg", ".jpeg", ".png", ".webp"];
     public string[] AllowedVideoExtensions { get; set; } = [".mp4", ".webm"];
 }
+
+public class PublicSiteOptions
+{
+    public const string SectionName = "Site";
+
+    public string Url { get; set; } = "https://aksarayotoelektrik.com";
+}

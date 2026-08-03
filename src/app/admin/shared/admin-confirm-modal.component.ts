@@ -1,6 +1,7 @@
-import { Component, computed, input, output } from '@angular/core';
+import { Component, computed, effect, input, output } from '@angular/core';
 import { ADMIN_CONFIRM_MESSAGES, AdminConfirmKind } from './admin-confirm.types';
 import { AdminButtonSpinnerComponent } from './admin-button-spinner.component';
+import { lockAdminOverlay } from './admin-overlay-lock';
 
 export type AdminConfirmVariant = 'primary' | 'danger' | 'secondary';
 
@@ -20,6 +21,13 @@ export class AdminConfirmModalComponent {
 
   readonly cancelled = output<void>();
   readonly confirmed = output<void>();
+
+  constructor() {
+    effect((onCleanup) => {
+      if (!this.open()) return;
+      onCleanup(lockAdminOverlay());
+    });
+  }
 
   readonly resolvedTitle = computed(() => this.title() ?? ADMIN_CONFIRM_MESSAGES[this.kind()]);
 

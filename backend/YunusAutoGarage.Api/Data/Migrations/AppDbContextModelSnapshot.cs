@@ -73,6 +73,14 @@ namespace YunusAutoGarage.Api.Data.Migrations
                         .HasColumnType("date")
                         .HasColumnName("date");
 
+                    b.Property<DateTime?>("DeliveredAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("delivered_at");
+
+                    b.Property<DateTime?>("EstimatedCompletionAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("estimated_completion_at");
+
                     b.Property<string>("FullName")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -99,6 +107,10 @@ namespace YunusAutoGarage.Api.Data.Migrations
                         .HasColumnType("character varying(15)")
                         .HasColumnName("phone");
 
+                    b.Property<DateTime?>("ReadyAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("ready_at");
+
                     b.Property<int>("ServiceId")
                         .HasColumnType("integer")
                         .HasColumnName("service_id");
@@ -112,6 +124,17 @@ namespace YunusAutoGarage.Api.Data.Migrations
                         .HasMaxLength(10)
                         .HasColumnType("character varying(10)")
                         .HasColumnName("time_slot");
+
+                    b.Property<string>("TrackingNote")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)")
+                        .HasColumnName("tracking_note");
+
+                    b.Property<string>("TrackingToken")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)")
+                        .HasColumnName("tracking_token");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone")
@@ -129,6 +152,22 @@ namespace YunusAutoGarage.Api.Data.Migrations
                         .HasColumnType("character varying(100)")
                         .HasColumnName("vehicle_model");
 
+                    b.Property<DateTime?>("VehicleReceivedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("vehicle_received_at");
+
+                    b.Property<int>("VehicleWorkStatus")
+                        .HasColumnType("integer")
+                        .HasColumnName("vehicle_work_status");
+
+                    b.Property<int?>("VehicleYear")
+                        .HasColumnType("integer")
+                        .HasColumnName("vehicle_year");
+
+                    b.Property<DateTime?>("WorkStartedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("work_started_at");
+
                     b.HasKey("Id");
 
                     b.HasIndex("Phone");
@@ -136,6 +175,9 @@ namespace YunusAutoGarage.Api.Data.Migrations
                     b.HasIndex("ServiceId");
 
                     b.HasIndex("Status");
+
+                    b.HasIndex("TrackingToken")
+                        .IsUnique();
 
                     b.HasIndex("Date", "TimeSlot");
 

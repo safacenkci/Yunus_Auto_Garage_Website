@@ -1,3 +1,5 @@
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using YunusAutoGarage.Api.Data;
 using YunusAutoGarage.Api.Dtos;
 using YunusAutoGarage.Api.Entities;
@@ -7,8 +9,11 @@ namespace YunusAutoGarage.Api.Services;
 public class AdminService(
     AppDbContext db,
     ISmsService smsService,
-    AnalyticsService analyticsService)
+    AnalyticsService analyticsService,
+    IOptions<PublicSiteOptions> siteOptions)
 {
+    private readonly PublicSiteOptions _site = siteOptions.Value;
+
     public async Task<PagedResult<AppointmentResponse>> GetAppointmentsAsync(
         string? status,
         DateOnly? date,
@@ -56,6 +61,11 @@ public class AdminService(
             return null;
         }
 
+        if (string.IsNullOrWhiteSpace(appointment.TrackingToken))
+        {
+            appointment.TrackingToken = TrackingService.GenerateTrackingToken();
+        }
+
         var oldStatus = appointment.Status;
         appointment.Status = newStatus;
         appointment.UpdatedAt = DateTime.UtcNow;
@@ -63,8 +73,54 @@ public class AdminService(
 
         if (newStatus == AppointmentStatus.Confirmed && oldStatus != AppointmentStatus.Confirmed)
         {
-            _ = smsService.SendCustomerConfirmationAsync(appointment, ct);
+            _ = smsService.SendCustomerConfirmationAsync(appointment, BuildTrackingUrl(appointment.TrackingToken), ct);
         }
+
+        return AppointmentService.ToResponse(appointment, appointment.Service.Name);
+    }
+
+    public async Task<AppointmentResponse?> UpdateTrackingAsync(
+        Guid id,
+        UpdateVehicleTrackingRequest request,
+        CancellationToken ct = default)
+    {
+        if (!Enum.TryParse<VehicleWorkStatus>(request.VehicleWorkStatus, true, out var newWorkStatus))
+        {
+            throw new ArgumentException("Geçersiz araç durumu.");
+        }
+
+        var appointment = await db.Appointments.Include(a => a.Service).FirstOrDefaultAsync(a => a.Id == id, ct);
+        if (appointment is null)
+        {
+            return null;
+        }
+
+        if (appointment.Status is AppointmentStatus.Cancelled or AppointmentStatus.NoShow)
+        {
+            throw new ArgumentException("İptal veya gelmedi durumundaki randevularda takip güncellenemez.");
+        }
+
+        if (string.IsNullOrWhiteSpace(appointment.TrackingToken))
+        {
+            appointment.TrackingToken = TrackingService.GenerateTrackingToken();
+        }
+
+        var note = string.IsNullOrWhiteSpace(request.TrackingNote) ? null : request.TrackingNote.Trim();
+        if (note is { Length: > 500 })
+        {
+            throw new ArgumentException("Takip notu en fazla 500 karakter olabilir.");
+        }
+
+        var now = DateTime.UtcNow;
+        appointment.VehicleWorkStatus = newWorkStatus;
+        appointment.EstimatedCompletionAt = request.EstimatedCompletionAt?.ToUniversalTime();
+        appointment.TrackingNote = note;
+        appointment.UpdatedAt = now;
+        TrackingService.ApplyWorkStatusTimestamps(appointment, newWorkStatus, now);
+
+        await db.SaveChangesAsync(ct);
+
+        _ = smsService.SendTrackingUpdateAsync(appointment, BuildTrackingUrl(appointment.TrackingToken), ct);
 
         return AppointmentService.ToResponse(appointment, appointment.Service.Name);
     }
@@ -152,6 +208,17 @@ public class AdminService(
     {
         var phones = await ResolveRecipientsAsync(request, ct);
         return await smsService.SendBulkAsync(phones, request.Message, ct);
+    }
+
+    private string BuildTrackingUrl(string token)
+    {
+        var baseUrl = (_site.Url ?? string.Empty).TrimEnd('/');
+        if (string.IsNullOrWhiteSpace(baseUrl))
+        {
+            baseUrl = "https://aksarayotoelektrik.com";
+        }
+
+        return $"{baseUrl}/takip/{token}";
     }
 
     private async Task<List<string>> ResolveRecipientsAsync(BulkSmsRequest request, CancellationToken ct)

@@ -14,6 +14,14 @@ export const routes: Routes = [
         path: 'randevu',
         loadComponent: () => import('./pages/booking/booking').then((m) => m.BookingComponent),
       },
+      {
+        path: 'kvkk',
+        loadComponent: () => import('./pages/kvkk/kvkk').then((m) => m.KvkkComponent),
+      },
+      {
+        path: 'takip/:token',
+        loadComponent: () => import('./pages/tracking/tracking').then((m) => m.TrackingComponent),
+      },
     ],
   },
   {

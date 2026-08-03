@@ -1,0 +1,194 @@
+<section class="page-container section-padding w-full max-w-3xl mx-auto">
+  <div class="mb-xl">
+    <a
+      routerLink="/randevu"
+      class="touch-target inline-flex items-center gap-xs text-on-surface-variant hover:text-primary font-label-sm"
+    >
+      <span class="material-symbols-outlined text-base">arrow_back</span>
+      Randevu sayfasına dön
+    </a>
+  </div>
+
+  <header class="flex flex-col gap-xs mb-2xl">
+    <span class="font-label-sm text-label-sm text-secondary tracking-widest uppercase"
+      >6698 sayılı KVKK</span
+    >
+    <h1 class="font-headline-lg text-headline-lg-fluid text-primary">
+      Kişisel Verilerin Korunması Aydınlatma Metni
+    </h1>
+    <p class="font-body-md text-on-surface-variant">
+      Bu metin, {{ config.BUSINESS_NAME }} tarafından 6698 sayılı Kişisel Verilerin Korunması Kanunu
+      kapsamında bilgilendirme amacıyla hazırlanmıştır.
+    </p>
+  </header>
+
+  <div class="flex flex-col gap-xl font-body-md text-on-surface">
+    <section class="rounded-3xl border border-outline-variant/30 bg-surface-bright p-lg md:p-xl flex flex-col gap-md">
+      <h2 class="font-headline-md text-headline-md text-primary">1. Veri sorumlusu</h2>
+      <p>
+        Kişisel verileriniz; <strong>{{ config.BUSINESS_NAME }}</strong> tarafından veri sorumlusu
+        sıfatıyla işlenmektedir.
+      </p>
+      <ul class="list-disc pl-lg flex flex-col gap-xs text-on-surface-variant">
+        <li>Adres: {{ config.STREET_ADDRESS }}, {{ config.POSTAL_CODE }} {{ config.CITY }}</li>
+        <li>
+          Telefon:
+          <a [href]="phoneHref" class="text-primary underline underline-offset-2 touch-target inline-flex items-center">{{
+            config.PHONE_DISPLAY
+          }}</a>
+        </li>
+        <li>Web: {{ config.SITE_URL }}</li>
+      </ul>
+    </section>
+
+    <section class="rounded-3xl border border-outline-variant/30 bg-surface-bright p-lg md:p-xl flex flex-col gap-md">
+      <h2 class="font-headline-md text-headline-md text-primary">2. İşlenen kişisel veriler</h2>
+      <p class="text-on-surface-variant">
+        Online randevu ve site kullanımı kapsamında aşağıdaki veriler işlenebilir:
+      </p>
+
+      <!-- Mobile: stacked definition list -->
+      <dl class="sm:hidden flex flex-col gap-md">
+        <div>
+          <dt class="font-bold text-on-surface">Kimlik</dt>
+          <dd class="text-on-surface-variant mt-xs">Ad soyad</dd>
+        </div>
+        <div>
+          <dt class="font-bold text-on-surface">İletişim</dt>
+          <dd class="text-on-surface-variant mt-xs">Telefon numarası</dd>
+        </div>
+        <div>
+          <dt class="font-bold text-on-surface">Araç bilgileri</dt>
+          <dd class="text-on-surface-variant mt-xs">Araç kategorisi, marka, model, yıl; varsa plaka</dd>
+        </div>
+        <div>
+          <dt class="font-bold text-on-surface">Randevu / hizmet</dt>
+          <dd class="text-on-surface-variant mt-xs">
+            Seçilen hizmet, işlemler, tarih-saat, talep notu; araç iş süreç durumu ve tahmini bitiş
+            bilgisi
+          </dd>
+        </div>
+        <div>
+          <dt class="font-bold text-on-surface">İletişim kayıtları</dt>
+          <dd class="text-on-surface-variant mt-xs">
+            Randevu onayı, hatırlatma ve durum bilgilendirme SMS içerikleri
+          </dd>
+        </div>
+        <div>
+          <dt class="font-bold text-on-surface">Site kullanım verileri</dt>
+          <dd class="text-on-surface-variant mt-xs">
+            Ziyaret edilen sayfa, anonim ziyaretçi kimliği, IP adresi özeti (hash), tarayıcı bilgisi,
+            yönlendiren adres
+          </dd>
+        </div>
+      </dl>
+
+      <!-- sm+: table -->
+      <div class="hidden sm:block overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+          <thead>
+            <tr class="border-b border-outline-variant/40">
+              <th class="py-sm pr-md font-label-md text-primary">Veri kategorisi</th>
+              <th class="py-sm font-label-md text-primary">Örnekler</th>
+            </tr>
+          </thead>
+          <tbody class="text-on-surface-variant">
+            <tr class="border-b border-outline-variant/20">
+              <td class="py-sm pr-md align-top font-bold text-on-surface">Kimlik</td>
+              <td class="py-sm">Ad soyad</td>
+            </tr>
+            <tr class="border-b border-outline-variant/20">
+              <td class="py-sm pr-md align-top font-bold text-on-surface">İletişim</td>
+              <td class="py-sm">Telefon numarası</td>
+            </tr>
+            <tr class="border-b border-outline-variant/20">
+              <td class="py-sm pr-md align-top font-bold text-on-surface">Araç bilgileri</td>
+              <td class="py-sm">Araç kategorisi, marka, model, yıl; varsa plaka</td>
+            </tr>
+            <tr class="border-b border-outline-variant/20">
+              <td class="py-sm pr-md align-top font-bold text-on-surface">Randevu / hizmet</td>
+              <td class="py-sm">
+                Seçilen hizmet, işlemler, tarih-saat, talep notu; araç iş süreç durumu ve tahmini
+                bitiş bilgisi
+              </td>
+            </tr>
+            <tr class="border-b border-outline-variant/20">
+              <td class="py-sm pr-md align-top font-bold text-on-surface">İletişim kayıtları</td>
+              <td class="py-sm">Randevu onayı, hatırlatma ve durum bilgilendirme SMS içerikleri</td>
+            </tr>
+            <tr>
+              <td class="py-sm pr-md align-top font-bold text-on-surface">Site kullanım verileri</td>
+              <td class="py-sm">
+                Ziyaret edilen sayfa, anonim ziyaretçi kimliği, IP adresi özeti (hash), tarayıcı
+                bilgisi, yönlendiren adres
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="rounded-3xl border border-outline-variant/30 bg-surface-bright p-lg md:p-xl flex flex-col gap-md">
+      <h2 class="font-headline-md text-headline-md text-primary">3. İşleme amaçları</h2>
+      <ul class="list-disc pl-lg flex flex-col gap-xs text-on-surface-variant">
+        <li>Online randevu talebinin alınması, planlanması ve yönetilmesi</li>
+        <li>Randevu onayı, hatırlatma ve araç durum takibi için SMS bilgilendirmesi</li>
+        <li>Hizmet kalitesinin artırılması ve müşteri taleplerinin karşılanması</li>
+        <li>Yasal yükümlülüklerin yerine getirilmesi</li>
+        <li>Site kullanımının ölçülmesi ve hizmet iyileştirmesi (analitik)</li>
+      </ul>
+    </section>
+
+    <section class="rounded-3xl border border-outline-variant/30 bg-surface-bright p-lg md:p-xl flex flex-col gap-md">
+      <h2 class="font-headline-md text-headline-md text-primary">4. Hukuki sebepler</h2>
+      <p class="text-on-surface-variant">
+        Verileriniz; KVKK m.5 kapsamında sözleşmenin kurulması/ifası, hukuki yükümlülük,
+        meşru menfaat ve açık rızanız (randevu formu onayı) hukuki sebeplerine dayanılarak
+        işlenir.
+      </p>
+    </section>
+
+    <section class="rounded-3xl border border-outline-variant/30 bg-surface-bright p-lg md:p-xl flex flex-col gap-md">
+      <h2 class="font-headline-md text-headline-md text-primary">5. Aktarım</h2>
+      <p class="text-on-surface-variant">
+        Kişisel verileriniz; SMS gönderimi için kullanılan hizmet sağlayıcıya (iletişim
+        hizmetinin ifası amacıyla) ve kanunen yetkili kamu kurumlarına gerekli olduğu ölçüde
+        aktarılabilir. Verileriniz ticari amaçla üçüncü kişilere satılmaz.
+      </p>
+    </section>
+
+    <section class="rounded-3xl border border-outline-variant/30 bg-surface-bright p-lg md:p-xl flex flex-col gap-md">
+      <h2 class="font-headline-md text-headline-md text-primary">6. Saklama süresi</h2>
+      <p class="text-on-surface-variant">
+        Randevu ve iletişim kayıtları, hizmet ilişkisinin gerektirdiği süre ve ilgili mevzuatta
+        öngörülen saklama süreleri boyunca tutulur; süre sonunda silinir, yok edilir veya anonim
+        hale getirilir. Site analitik verileri istatistiksel değerlendirme amacıyla sınırlı süre
+        saklanır.
+      </p>
+    </section>
+
+    <section class="rounded-3xl border border-outline-variant/30 bg-surface-bright p-lg md:p-xl flex flex-col gap-md">
+      <h2 class="font-headline-md text-headline-md text-primary">7. Haklarınız</h2>
+      <p class="text-on-surface-variant">
+        KVKK m.11 uyarınca; verilerinizin işlenip işlenmediğini öğrenme, işlenmişse bilgi talep
+        etme, işlenme amacını ve amaca uygun kullanılıp kullanılmadığını öğrenme, yurt içinde /
+        yurt dışında aktarıldığı üçüncü kişileri bilme, eksik veya yanlış işlenmişse düzeltilmesini
+        isteme, KVKK’da öngörülen şartlarda silinmesini veya yok edilmesini isteme, otomatik
+        sistemler ile analiz edilmesi nedeniyle aleyhinize bir sonucun ortaya çıkmasına itiraz
+        etme ve kanuna aykırı işleme nedeniyle zararın giderilmesini talep etme haklarına
+        sahipsiniz.
+      </p>
+      <p class="text-on-surface-variant">
+        Başvurularınızı
+        <a [href]="phoneHref" class="text-primary underline underline-offset-2 touch-target inline-flex items-center">{{
+          config.PHONE_DISPLAY
+        }}</a>
+        numarası üzerinden veya işletme adresimize yazılı olarak iletebilirsiniz.
+      </p>
+    </section>
+
+    <p class="font-label-sm text-label-sm text-on-surface-variant text-center">
+      Son güncelleme: Ağustos 2026 · {{ config.BUSINESS_NAME }}
+    </p>
+  </div>
+</section>

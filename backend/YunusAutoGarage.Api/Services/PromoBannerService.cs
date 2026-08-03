@@ -37,16 +37,12 @@ public class PromoBannerService(AppDbContext db)
         }
 
         var ctaText = NormalizeOptional(request.CtaText, 100);
-        var ctaLink = NormalizeOptional(request.CtaLink, 500) ?? DefaultCtaLink;
+        if (ctaText is null)
+        {
+            throw new ArgumentException("Buton metni zorunludur.");
+        }
 
-        if (ctaLink.StartsWith('/') || Uri.TryCreate(ctaLink, UriKind.Absolute, out _))
-        {
-            // valid
-        }
-        else
-        {
-            throw new ArgumentException("CTA bağlantısı / ile başlamalı veya geçerli bir URL olmalıdır.");
-        }
+        var ctaLink = NormalizeCtaLink(request.CtaLink) ?? DefaultCtaLink;
 
         var settings = await GetOrCreateAsync(ct);
         settings.IsEnabled = request.IsEnabled;
@@ -114,6 +110,44 @@ public class PromoBannerService(AppDbContext db)
 
         var trimmed = value.Trim();
         return trimmed.Length > maxLength ? trimmed[..maxLength] : trimmed;
+    }
+
+    private static string? NormalizeCtaLink(string? value)
+    {
+        var trimmed = NormalizeOptional(value, 500);
+        if (trimmed is null)
+        {
+            return null;
+        }
+
+        // Site içi yol: /randevu, /#hizmetler
+        if (trimmed.StartsWith('/'))
+        {
+            return trimmed;
+        }
+
+        // Protokolü olmayan alan adları: example.com, www.example.com
+        if (!trimmed.Contains("://", StringComparison.Ordinal)
+            && !trimmed.Contains(':', StringComparison.Ordinal)
+            && trimmed.Contains('.', StringComparison.Ordinal))
+        {
+            trimmed = "https://" + trimmed;
+        }
+
+        if (!Uri.TryCreate(trimmed, UriKind.Absolute, out var uri))
+        {
+            throw new ArgumentException(
+                "CTA bağlantısı site içi yol (/randevu), tam URL (https://…) veya tel:/mailto: gibi geçerli bir link olmalıdır.");
+        }
+
+        // javascript: gibi tehlikeli şemaları engelle
+        var scheme = uri.Scheme.ToLowerInvariant();
+        if (scheme is "javascript" or "data" or "vbscript")
+        {
+            throw new ArgumentException("Bu bağlantı türüne izin verilmiyor.");
+        }
+
+        return trimmed;
     }
 
     private static PromoBannerDto ToPublicDto(PromoBannerSettings settings) =>

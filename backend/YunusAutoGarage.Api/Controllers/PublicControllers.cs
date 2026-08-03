@@ -42,6 +42,50 @@ public class PromoBannerController(PromoBannerService promoBannerService) : Cont
 }
 
 [ApiController]
+[Route("api/vehicles")]
+public class VehiclesController(VehicleLookupService vehicleLookupService) : ControllerBase
+{
+    [HttpGet("categories")]
+    public async Task<ActionResult<IReadOnlyList<VehicleCategoryDto>>> GetCategories(CancellationToken ct) =>
+        Ok(await vehicleLookupService.GetCategoriesAsync(ct));
+
+    [HttpGet("makes")]
+    public async Task<ActionResult<IReadOnlyList<VehicleMakeDto>>> GetMakes(
+        [FromQuery] string category = "otomobil",
+        CancellationToken ct = default) =>
+        Ok(await vehicleLookupService.GetMakesAsync(category, ct));
+
+    [HttpGet("models")]
+    public async Task<ActionResult<IReadOnlyList<VehicleModelDto>>> GetModels([FromQuery] int makeId, CancellationToken ct)
+    {
+        if (makeId <= 0)
+        {
+            return BadRequest(Problem(title: "Geçersiz marka", detail: "makeId parametresi zorunludur."));
+        }
+
+        return Ok(await vehicleLookupService.GetModelsForMakeAsync(makeId, ct));
+    }
+}
+
+[ApiController]
+[Route("api/tracking")]
+public class TrackingController(TrackingService trackingService) : ControllerBase
+{
+    [HttpGet("{token}")]
+    [EnableRateLimiting("tracking")]
+    public async Task<ActionResult<TrackingResponse>> Get(string token, CancellationToken ct)
+    {
+        var result = await trackingService.GetByTokenAsync(token, ct);
+        if (result is null)
+        {
+            return NotFound(Problem(title: "Takip bulunamadı", detail: "Takip linki geçersiz veya süresi dolmuş olabilir."));
+        }
+
+        return Ok(result);
+    }
+}
+
+[ApiController]
 [Route("api/appointments")]
 public class AppointmentsController(AppointmentService appointmentService, SlotService slotService) : ControllerBase
 {

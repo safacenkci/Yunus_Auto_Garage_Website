@@ -7,7 +7,12 @@
         <p class="font-body-md text-on-surface-variant mb-xs"><strong>{{ result.fullName }}</strong></p>
         <p class="font-body-md text-on-surface-variant">{{ result.serviceName }}</p>
         <p class="font-body-md text-on-surface-variant">{{ result.date }} — {{ result.timeSlot }}</p>
-        <p class="font-body-md text-on-surface-variant">{{ result.vehicleMake }} {{ result.vehicleModel }}</p>
+        <p class="font-body-md text-on-surface-variant">
+          {{ result.vehicleMake }} {{ result.vehicleModel }}
+          @if (result.vehicleYear) {
+            <span>({{ result.vehicleYear }})</span>
+          }
+        </p>
       </div>
       <p class="font-body-md text-on-surface-variant prose-width mx-auto">
         Randevunuz onaylandığında SMS ile bilgilendirileceksiniz.
@@ -36,7 +41,7 @@
       @for (s of [1, 2, 3]; track s) {
         <button
           type="button"
-          class="touch-target px-lg py-sm rounded-full font-label-md text-label-md transition-colors"
+          class="touch-target px-md sm:px-lg py-sm rounded-full font-label-md text-label-md transition-colors"
           [class.bg-secondary-container]="step() === s"
           [class.text-on-secondary-container]="step() === s"
           [class.bg-surface-container-low]="step() !== s"
@@ -46,7 +51,8 @@
           [class.opacity-60]="!canGoToStep(s) && step() !== s"
           (click)="canGoToStep(s) ? goToStep(s) : null"
         >
-          {{ s }}. @if (s === 1) { Hizmet } @else if (s === 2) { Tarih & Saat } @else { Bilgiler }
+          <span class="sm:hidden">{{ s }}. @if (s === 1) { Hizmet } @else if (s === 2) { Tarih } @else { Bilgi }</span>
+          <span class="hidden sm:inline">{{ s }}. @if (s === 1) { Hizmet } @else if (s === 2) { Tarih & Saat } @else { Bilgiler }</span>
         </button>
       }
     </div>
@@ -117,11 +123,11 @@
     <!-- Step 2: Date & Time -->
     @if (step() === 2) {
       <div class="max-w-4xl mx-auto flex flex-col gap-2xl">
-        <div class="flex gap-md overflow-x-auto pb-md">
+        <div class="flex gap-md overflow-x-auto pb-md max-w-full overscroll-x-contain snap-x snap-mandatory">
           @for (day of days(); track day.date) {
             <button
               type="button"
-              class="flex-shrink-0 flex flex-col items-center touch-target px-lg py-md rounded-2xl border min-w-[80px]"
+              class="flex-shrink-0 flex flex-col items-center touch-target px-lg py-md rounded-2xl border min-w-[80px] snap-start"
               [class.bg-surface-container-lowest]="selectedDate() === day.date"
               [class.border-secondary-container]="selectedDate() === day.date"
               (click)="selectDate(day.date)"
@@ -164,35 +170,121 @@
     <!-- Step 3: Form -->
     @if (step() === 3) {
       <div class="max-w-4xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-2xl">
-        <form [formGroup]="form" class="flex flex-col gap-lg" (ngSubmit)="submit()">
+        <div class="bg-surface-container-lowest p-lg rounded-2xl border border-outline-variant/20 shadow-premium h-fit order-1 lg:order-2">
+          <h3 class="font-headline-md text-headline-sm text-primary mb-md">Özet</h3>
+          <p class="font-body-md text-on-surface-variant"><strong>Hizmet:</strong> {{ selectedServiceName() }}</p>
+          @if (selectedOptions().length > 0) {
+            <p class="font-body-md text-on-surface-variant"><strong>İşlemler:</strong> {{ selectedOptions().join(', ') }}</p>
+          }
+          <p class="font-body-md text-on-surface-variant"><strong>Tarih:</strong> {{ selectedDate() }}</p>
+          <p class="font-body-md text-on-surface-variant"><strong>Saat:</strong> {{ selectedTime() }}</p>
+        </div>
+
+        <form [formGroup]="form" class="flex flex-col gap-lg order-2 lg:order-1" (ngSubmit)="submit()">
           <div>
             <label for="fullName" class="font-label-md text-label-md text-on-surface-variant">Ad Soyad *</label>
-            <input id="fullName" formControlName="fullName" class="form-input" />
+            <input
+              id="fullName"
+              formControlName="fullName"
+              class="form-input"
+              autocomplete="name"
+              (input)="sanitizeFullName($event)"
+            />
             @if (fieldError('fullName'); as err) { <p class="text-error font-label-sm mt-xs">{{ err }}</p> }
           </div>
           <div>
             <label for="phone" class="font-label-md text-label-md text-on-surface-variant">Telefon *</label>
-            <input id="phone" formControlName="phone" placeholder="05XX XXX XX XX" class="form-input" />
+            <input
+              id="phone"
+              formControlName="phone"
+              class="form-input"
+              type="tel"
+              inputmode="tel"
+              maxlength="16"
+              placeholder="05XXXXXXXXX veya +XX..."
+              autocomplete="tel"
+              (input)="sanitizePhone($event)"
+            />
             @if (fieldError('phone'); as err) { <p class="text-error font-label-sm mt-xs">{{ err }}</p> }
           </div>
-          <div class="grid grid-cols-2 gap-md">
+          <div>
+            <label for="vehicleCategory" class="font-label-md text-label-md text-on-surface-variant">Araç Kategorisi *</label>
+            @if (categoriesLoading()) {
+              <div class="form-input animate-pulse bg-surface-container-low">&nbsp;</div>
+            } @else if (categoriesLoadError()) {
+              <p class="text-error font-label-sm mt-xs">Kategoriler yüklenemedi. Sayfayı yenileyip tekrar deneyin.</p>
+            } @else {
+              <select
+                id="vehicleCategory"
+                class="form-input"
+                [value]="selectedCategoryId()"
+                (change)="selectedCategoryId.set($any($event.target).value); onCategoryChange()"
+              >
+                @for (category of vehicleCategories(); track category.id) {
+                  <option [value]="category.id">{{ category.name }}</option>
+                }
+              </select>
+            }
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-md">
             <div>
               <label for="vehicleMake" class="font-label-md text-label-md text-on-surface-variant">Araç Marka *</label>
-              <input id="vehicleMake" formControlName="vehicleMake" class="form-input" />
+              @if (makesLoading()) {
+                <div class="form-input animate-pulse bg-surface-container-low">&nbsp;</div>
+              } @else if (makesLoadError()) {
+                <p class="text-error font-label-sm mt-xs">Markalar yüklenemedi. Sayfayı yenileyip tekrar deneyin.</p>
+              } @else {
+                <select id="vehicleMake" formControlName="vehicleMake" class="form-input">
+                  <option value="" disabled>Marka seçin</option>
+                  @for (make of vehicleMakes(); track make.id) {
+                    <option [value]="make.name">{{ make.name }}</option>
+                  }
+                </select>
+              }
+              @if (fieldError('vehicleMake'); as err) { <p class="text-error font-label-sm mt-xs">{{ err }}</p> }
             </div>
             <div>
               <label for="vehicleModel" class="font-label-md text-label-md text-on-surface-variant">Araç Model *</label>
-              <input id="vehicleModel" formControlName="vehicleModel" class="form-input" />
+              <select
+                id="vehicleModel"
+                formControlName="vehicleModel"
+                class="form-input"
+                [class.opacity-60]="modelsLoading() || !selectedMakeId()"
+              >
+                <option value="">
+                  @if (modelsLoading()) {
+                    Modeller yükleniyor...
+                  } @else if (selectedMakeId()) {
+                    Model seçin
+                  } @else {
+                    Önce marka seçin
+                  }
+                </option>
+                @for (model of vehicleModels(); track model.id) {
+                  <option [value]="model.name">{{ model.name }}</option>
+                }
+              </select>
+              @if (fieldError('vehicleModel'); as err) { <p class="text-error font-label-sm mt-xs">{{ err }}</p> }
+            </div>
+            <div>
+              <label for="vehicleYear" class="font-label-md text-label-md text-on-surface-variant">Araç Yılı *</label>
+              <select id="vehicleYear" formControlName="vehicleYear" class="form-input">
+                <option value="" disabled>Yıl seçin</option>
+                @for (year of vehicleYears; track year) {
+                  <option [value]="year">{{ year }}</option>
+                }
+              </select>
+              @if (fieldError('vehicleYear'); as err) { <p class="text-error font-label-sm mt-xs">{{ err }}</p> }
             </div>
           </div>
           @if (serviceOptions().length > 0) {
-            <fieldset class="flex flex-col gap-md">
+            <fieldset class="flex flex-col gap-sm">
               <legend class="font-label-md text-label-md text-on-surface-variant mb-xs">İşlem seçin *</legend>
               @for (option of serviceOptions(); track option) {
-                <label class="flex items-center gap-md cursor-pointer">
+                <label class="flex items-center gap-md cursor-pointer min-h-11 py-sm px-sm rounded-lg hover:bg-surface-container-low">
                   <input
                     type="checkbox"
-                    class="touch-target"
+                    class="w-5 h-5 shrink-0"
                     [checked]="isOptionSelected(option)"
                     (change)="toggleOption(option)"
                   />
@@ -204,10 +296,17 @@
               }
             </fieldset>
           }
-          <label class="flex items-start gap-md cursor-pointer">
-            <input type="checkbox" formControlName="kvkkConsent" class="mt-1 touch-target" />
+          <label class="flex items-start gap-md cursor-pointer min-h-11 py-sm">
+            <input type="checkbox" formControlName="kvkkConsent" class="mt-1 w-5 h-5 shrink-0" />
             <span class="font-body-md text-label-md text-on-surface-variant">
-              Kişisel verilerimin randevu oluşturma amacıyla işlenmesini kabul ediyorum. *
+              Kişisel verilerimin randevu oluşturma amacıyla işlenmesini
+              <a
+                routerLink="/kvkk"
+                target="_blank"
+                rel="noopener"
+                class="text-blue-600 underline underline-offset-2 hover:text-blue-800 font-semibold"
+                (click)="$event.stopPropagation()"
+              >kabul ediyorum</a>. *
             </span>
           </label>
           @if (fieldError('kvkkConsent'); as err) { <p class="text-error font-label-sm">{{ err }}</p> }
@@ -223,16 +322,6 @@
             Randevu Talebi Gönder
           </button>
         </form>
-
-        <div class="bg-surface-container-lowest p-lg rounded-2xl border border-outline-variant/20 shadow-premium h-fit">
-          <h3 class="font-headline-md text-headline-sm text-primary mb-md">Özet</h3>
-          <p class="font-body-md text-on-surface-variant"><strong>Hizmet:</strong> {{ selectedServiceName() }}</p>
-          @if (selectedOptions().length > 0) {
-            <p class="font-body-md text-on-surface-variant"><strong>İşlemler:</strong> {{ selectedOptions().join(', ') }}</p>
-          }
-          <p class="font-body-md text-on-surface-variant"><strong>Tarih:</strong> {{ selectedDate() }}</p>
-          <p class="font-body-md text-on-surface-variant"><strong>Saat:</strong> {{ selectedTime() }}</p>
-        </div>
       </div>
     }
   }

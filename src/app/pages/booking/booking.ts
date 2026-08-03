@@ -1,11 +1,13 @@
 import { isPlatformBrowser } from '@angular/common';
 import { Component, inject, OnInit, PLATFORM_ID, signal } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
 import { BookingService } from '../../core/services/booking.service';
-import { AppointmentResponse, ServiceDto, SlotDto } from '../../core/models/api.models';
+import { VehicleService } from '../../core/services/vehicle.service';
+import { AppointmentResponse, ServiceDto, SlotDto, VehicleCategoryDto, VehicleMakeDto, VehicleModelDto } from '../../core/models/api.models';
 import { SITE_CONFIG } from '../../site-config';
+import { isValidPhone, sanitizePhoneInput } from '../../core/utils/phone.util';
 
 interface DayOption {
   date: string;
@@ -21,6 +23,7 @@ interface DayOption {
 export class BookingComponent implements OnInit {
   private readonly fb = inject(FormBuilder);
   private readonly bookingService = inject(BookingService);
+  private readonly vehicleService = inject(VehicleService);
   private readonly platformId = inject(PLATFORM_ID);
 
   readonly config = SITE_CONFIG;
@@ -37,7 +40,17 @@ export class BookingComponent implements OnInit {
   readonly days = signal<DayOption[]>([]);
   readonly customServiceNoteTouched = signal(false);
   readonly selectedOptionsTouched = signal(false);
+  readonly vehicleCategories = signal<VehicleCategoryDto[]>([]);
+  readonly vehicleMakes = signal<VehicleMakeDto[]>([]);
+  readonly vehicleModels = signal<VehicleModelDto[]>([]);
+  readonly categoriesLoading = signal(false);
+  readonly makesLoading = signal(false);
+  readonly modelsLoading = signal(false);
+  readonly categoriesLoadError = signal(false);
+  readonly makesLoadError = signal(false);
 
+  selectedCategoryId = signal('otomobil');
+  selectedMakeId = signal<number | null>(null);
   selectedServiceId = signal<number | null>(null);
   selectedDate = signal<string | null>(null);
   selectedTime = signal<string | null>(null);
@@ -45,16 +58,42 @@ export class BookingComponent implements OnInit {
   selectedOptions = signal<string[]>([]);
 
   readonly form = this.fb.nonNullable.group({
-    fullName: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(100)]],
-    phone: ['', [Validators.required, Validators.pattern(/^0?5\d{9}$/)]],
+    fullName: [
+      '',
+      [
+        Validators.required,
+        Validators.minLength(3),
+        Validators.maxLength(100),
+        Validators.pattern(/^[a-zA-ZçÇğĞıİöÖşŞüÜ\s]+$/),
+      ],
+    ],
+    phone: [
+      '',
+      [
+        Validators.required,
+        (ctrl: AbstractControl): ValidationErrors | null =>
+          isValidPhone(String(ctrl.value ?? '')) ? null : { phone: true },
+      ],
+    ],
     vehicleMake: ['', Validators.required],
     vehicleModel: ['', Validators.required],
+    vehicleYear: ['', Validators.required],
     kvkkConsent: [false, Validators.requiredTrue],
   });
 
+  readonly vehicleYears: number[] = Array.from(
+    { length: new Date().getFullYear() + 1 - 1950 + 1 },
+    (_, i) => new Date().getFullYear() + 1 - i
+  );
+
   ngOnInit() {
+    this.form.controls.vehicleModel.disable();
     this.buildDays();
     if (isPlatformBrowser(this.platformId)) {
+      this.form.controls.vehicleMake.valueChanges.subscribe((makeName) => {
+        this.handleMakeSelection(makeName);
+      });
+
       this.bookingService.getServices().subscribe({
         next: (s) => {
           this.services.set(this.normalizeServices(s));
@@ -179,11 +218,116 @@ export class BookingComponent implements OnInit {
     this.selectedTime.set(time);
     this.step.set(3);
     this.slotConflict.set(false);
+    this.loadVehicleCategories();
+  }
+
+  loadVehicleCategories() {
+    if (!isPlatformBrowser(this.platformId)) {
+      return;
+    }
+
+    if (this.vehicleCategories().length > 0) {
+      this.loadVehicleMakes(this.selectedCategoryId());
+      return;
+    }
+
+    if (this.categoriesLoading()) {
+      return;
+    }
+
+    this.categoriesLoading.set(true);
+    this.categoriesLoadError.set(false);
+    this.vehicleService.getCategories().subscribe({
+      next: (categories) => {
+        this.vehicleCategories.set(categories);
+        this.categoriesLoading.set(false);
+        this.loadVehicleMakes(this.selectedCategoryId());
+      },
+      error: () => {
+        this.categoriesLoadError.set(true);
+        this.categoriesLoading.set(false);
+      },
+    });
+  }
+
+  loadVehicleMakes(category: string) {
+    if (!isPlatformBrowser(this.platformId) || this.makesLoading()) {
+      return;
+    }
+
+    this.makesLoading.set(true);
+    this.makesLoadError.set(false);
+    this.vehicleService.getMakes(category).subscribe({
+      next: (makes) => {
+        this.vehicleMakes.set(makes);
+        this.makesLoading.set(false);
+      },
+      error: () => {
+        this.makesLoadError.set(true);
+        this.makesLoading.set(false);
+      },
+    });
+  }
+
+  onCategoryChange() {
+    const categoryId = this.selectedCategoryId();
+    this.form.controls.vehicleMake.setValue('', { emitEvent: false });
+    this.resetModelSelect();
+    this.vehicleMakes.set([]);
+    this.loadVehicleMakes(categoryId);
+  }
+
+  private resetModelSelect() {
+    this.form.controls.vehicleModel.setValue('');
+    this.form.controls.vehicleModel.disable();
+    this.form.controls.vehicleModel.markAsUntouched();
+    this.selectedMakeId.set(null);
+    this.vehicleModels.set([]);
+    this.modelsLoading.set(false);
+  }
+
+  private handleMakeSelection(makeName: string) {
+    if (!makeName) {
+      this.resetModelSelect();
+      return;
+    }
+
+    const make = this.vehicleMakes().find((m) => m.name === makeName) ?? null;
+    this.selectedMakeId.set(make?.id ?? null);
+    this.form.controls.vehicleModel.setValue('');
+    this.form.controls.vehicleModel.disable();
+    this.vehicleModels.set([]);
+
+    if (!make) {
+      return;
+    }
+
+    this.modelsLoading.set(true);
+    this.vehicleService.getModels(make.id).subscribe({
+      next: (models) => {
+        this.vehicleModels.set(models);
+        this.modelsLoading.set(false);
+        if (models.length === 0) {
+          return;
+        }
+
+        this.form.controls.vehicleModel.enable();
+        if (this.selectedCategoryId() !== 'otomobil' && models.length === 1) {
+          this.form.controls.vehicleModel.setValue(models[0].name);
+        }
+      },
+      error: () => {
+        this.vehicleModels.set([]);
+        this.modelsLoading.set(false);
+        this.form.controls.vehicleModel.disable();
+      },
+    });
   }
 
   goToStep(s: number) {
     this.step.set(s);
     if (s === 2) this.slotConflict.set(false);
+    if (s === 3) this.loadVehicleCategories();
     if (s === 1) {
       this.selectedDate.set(null);
       this.selectedTime.set(null);
@@ -215,13 +359,17 @@ export class BookingComponent implements OnInit {
 
     const v = this.form.getRawValue();
 
+    const categoryName =
+      this.vehicleCategories().find((c) => c.id === this.selectedCategoryId())?.name ?? 'Otomobil';
+
     this.bookingService
       .createAppointment({
         fullName: v.fullName,
         phone: v.phone,
         serviceId: this.selectedServiceId()!,
-        vehicleMake: v.vehicleMake,
+        vehicleMake: `${categoryName} · ${v.vehicleMake}`,
         vehicleModel: v.vehicleModel,
+        vehicleYear: Number(v.vehicleYear),
         date: this.selectedDate()!,
         timeSlot: this.selectedTime()!,
         note: this.isOtherService() ? this.customServiceNote().trim() : undefined,
@@ -271,12 +419,35 @@ export class BookingComponent implements OnInit {
     return null;
   }
 
+  sanitizeFullName(event: Event) {
+    const input = event.target as HTMLInputElement;
+    const cleaned = input.value.replace(/[^a-zA-ZçÇğĞıİöÖşŞüÜ\s]/g, '');
+    if (cleaned !== input.value) {
+      input.value = cleaned;
+      this.form.controls.fullName.setValue(cleaned, { emitEvent: false });
+    }
+  }
+
+  sanitizePhone(event: Event) {
+    const input = event.target as HTMLInputElement;
+    const cleaned = sanitizePhoneInput(input.value);
+    if (cleaned !== input.value) {
+      input.value = cleaned;
+      this.form.controls.phone.setValue(cleaned, { emitEvent: false });
+    }
+  }
+
   fieldError(field: string): string | null {
     const ctrl = this.form.get(field);
     if (!ctrl?.touched || !ctrl.errors) return null;
     if (ctrl.errors['required'] || ctrl.errors['requiredTrue']) return 'Bu alan zorunludur.';
     if (ctrl.errors['minlength']) return 'En az 3 karakter giriniz.';
-    if (ctrl.errors['pattern']) return 'Geçerli bir telefon numarası giriniz (05XX XXX XX XX).';
+    if (ctrl.errors['pattern']) {
+      if (field === 'fullName') return 'Sadece harf giriniz.';
+    }
+    if (ctrl.errors['phone']) {
+      return 'Geçerli bir telefon numarası giriniz (8-15 rakam, örn. 05XX... veya +49...).';
+    }
     return 'Geçersiz değer.';
   }
 }
