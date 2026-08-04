@@ -3,6 +3,16 @@ import { Component, effect, inject, OnInit, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AdminApiService } from '../../../core/services/admin-api.service';
 import { AppointmentResponse } from '../../../core/models/api.models';
+import {
+  APPOINTMENT_STATUS_BADGES,
+  APPOINTMENT_STATUS_LABELS,
+  APPOINTMENT_STATUSES,
+  type AppointmentStatus,
+  VEHICLE_WORK_STATUS_BADGES,
+  VEHICLE_WORK_STATUS_LABELS,
+  VEHICLE_WORK_STATUSES,
+  type VehicleWorkStatus,
+} from '../../../core/models/api-contract';
 import { AdminConfirmModalComponent } from '../../shared/admin-confirm-modal.component';
 import { AdminConfirmKind } from '../../shared/admin-confirm.types';
 import { lockAdminOverlay } from '../../shared/admin-overlay-lock';
@@ -11,19 +21,11 @@ import { formatPhoneDisplay, phoneTelHref } from '../../../core/utils/phone.util
 type PendingConfirm = {
   id: string;
   kind: AdminConfirmKind;
-  status: string;
+  status: AppointmentStatus;
   description?: string;
   confirmLabel: string;
   confirmVariant: 'primary' | 'danger' | 'secondary';
 };
-
-const WORK_STATUS_OPTIONS = [
-  { value: 'None', label: 'Henüz işlem başlamadı' },
-  { value: 'VehicleReceived', label: 'Araç Teslim Alındı' },
-  { value: 'InProgress', label: 'İşleme Başlandı' },
-  { value: 'ReadyForPickup', label: 'Teslime Hazır' },
-  { value: 'Delivered', label: 'Teslim Edildi' },
-] as const;
 
 @Component({
   selector: 'app-appointments',
@@ -36,7 +38,7 @@ export class AppointmentsComponent implements OnInit {
 
   readonly appointments = signal<AppointmentResponse[]>([]);
   readonly total = signal(0);
-  readonly statusFilter = signal('');
+  readonly statusFilter = signal<AppointmentStatus | ''>('');
   readonly page = signal(1);
   readonly pendingConfirm = signal<PendingConfirm | null>(null);
   readonly confirming = signal(false);
@@ -44,10 +46,14 @@ export class AppointmentsComponent implements OnInit {
   readonly trackingSaving = signal(false);
   readonly trackingSaved = signal(false);
   readonly trackingError = signal<string | null>(null);
-  readonly workStatusOptions = WORK_STATUS_OPTIONS;
+  readonly statusFilterOptions = ['' as const, ...APPOINTMENT_STATUSES];
+  readonly workStatusOptions = VEHICLE_WORK_STATUSES.map((value) => ({
+    value,
+    label: VEHICLE_WORK_STATUS_LABELS[value],
+  }));
 
   readonly trackingForm = this.fb.nonNullable.group({
-    vehicleWorkStatus: ['None', Validators.required],
+    vehicleWorkStatus: ['None' as VehicleWorkStatus, Validators.required],
     estimatedDate: [''],
     estimatedTime: [''],
     trackingNote: [''],
@@ -76,7 +82,7 @@ export class AppointmentsComponent implements OnInit {
       });
   }
 
-  setStatusFilter(status: string) {
+  setStatusFilter(status: AppointmentStatus | '') {
     this.statusFilter.set(status);
     this.page.set(1);
     this.load();
@@ -103,7 +109,20 @@ export class AppointmentsComponent implements OnInit {
     });
   }
 
-  askStatusChange(id: string, status: string, confirmLabel: string, confirmVariant: 'primary' | 'danger' | 'secondary') {
+  isPending(status: AppointmentStatus): boolean {
+    return status === 'Pending';
+  }
+
+  isConfirmed(status: AppointmentStatus): boolean {
+    return status === 'Confirmed';
+  }
+
+  askStatusChange(
+    id: string,
+    status: AppointmentStatus,
+    confirmLabel: string,
+    confirmVariant: 'primary' | 'danger' | 'secondary'
+  ) {
     this.pendingConfirm.set({
       id,
       kind: 'confirm',
@@ -208,40 +227,19 @@ export class AppointmentsComponent implements OnInit {
       });
   }
 
-  statusLabel(status: string): string {
-    const map: Record<string, string> = {
-      Pending: 'Bekliyor',
-      Confirmed: 'Onaylı',
-      Completed: 'Tamamlandı',
-      Cancelled: 'İptal',
-      NoShow: 'Gelmedi',
-    };
-    return map[status] ?? status;
+  statusLabel(status: AppointmentStatus): string {
+    return APPOINTMENT_STATUS_LABELS[status] ?? status;
   }
 
-  statusClass(status: string): string {
-    const map: Record<string, string> = {
-      Pending: 'admin-badge--pending',
-      Confirmed: 'admin-badge--confirmed',
-      Completed: 'admin-badge--completed',
-      Cancelled: 'admin-badge--cancelled',
-      NoShow: 'admin-badge--noshow',
-    };
-    return map[status] ?? '';
+  statusClass(status: AppointmentStatus): string {
+    return APPOINTMENT_STATUS_BADGES[status] ?? '';
   }
 
-  workStatusLabel(status: string): string {
-    return WORK_STATUS_OPTIONS.find((o) => o.value === status)?.label ?? status;
+  workStatusLabel(status: VehicleWorkStatus): string {
+    return VEHICLE_WORK_STATUS_LABELS[status] ?? status;
   }
 
-  workStatusClass(status: string): string {
-    const map: Record<string, string> = {
-      None: 'admin-badge--work-none',
-      VehicleReceived: 'admin-badge--work-received',
-      InProgress: 'admin-badge--work-progress',
-      ReadyForPickup: 'admin-badge--work-ready',
-      Delivered: 'admin-badge--work-delivered',
-    };
-    return map[status] ?? 'admin-badge--work-none';
+  workStatusClass(status: VehicleWorkStatus): string {
+    return VEHICLE_WORK_STATUS_BADGES[status] ?? VEHICLE_WORK_STATUS_BADGES.None;
   }
 }

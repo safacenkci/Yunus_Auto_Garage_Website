@@ -15,11 +15,33 @@ public class AppointmentService(
 
     public async Task<IReadOnlyList<ServiceDto>> GetActiveServicesAsync(CancellationToken ct = default)
     {
-        return await db.Services
+        var services = await db.Services
             .Where(s => s.IsActive)
             .OrderBy(s => s.SortOrder)
-            .Select(s => new ServiceDto(s.Id, s.Name, s.Icon, s.Description))
+            .Select(s => new
+            {
+                s.Id,
+                s.Name,
+                s.Icon,
+                s.Description
+            })
             .ToListAsync(ct);
+
+        return services
+            .Select(s =>
+            {
+                var definition = ServiceCatalog.GetDefinition(s.Name);
+                return new ServiceDto(
+                    s.Id,
+                    definition.Code,
+                    s.Name,
+                    s.Icon,
+                    s.Description,
+                    definition.BookingMode,
+                    definition.Options
+                );
+            })
+            .ToList();
     }
 
     public async Task<AppointmentResponse?> CreateAsync(CreateAppointmentRequest request, CancellationToken ct = default)
@@ -57,7 +79,7 @@ public class AppointmentService(
         }
 
         string? note;
-        if (service.Name == "Diğer")
+        if (ServiceCatalog.RequiresNote(service.Name))
         {
             note = string.IsNullOrWhiteSpace(request.Note) ? null : request.Note.Trim();
             if (note is null || note.Length < 10)

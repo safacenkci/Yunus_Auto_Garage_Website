@@ -1,5 +1,10 @@
 import { Injectable, inject } from '@angular/core';
 import { ApiService } from './api.service';
+import type {
+  AppointmentStatus,
+  BulkSmsResult,
+  SmsRecipientSource,
+} from '../models/api-contract';
 import {
   AnalyticsResponse,
   AppointmentResponse,
@@ -21,14 +26,14 @@ export class AdminApiService {
     return this.api.get<DashboardSummary>('/admin/dashboard/summary');
   }
 
-  getAppointments(status?: string, date?: string, page = 1, pageSize = 20) {
+  getAppointments(status?: AppointmentStatus, date?: string, page = 1, pageSize = 20) {
     const params = new URLSearchParams({ page: String(page), pageSize: String(pageSize) });
     if (status) params.set('status', status);
     if (date) params.set('date', date);
     return this.api.get<PagedResult<AppointmentResponse>>(`/admin/appointments?${params}`);
   }
 
-  updateStatus(id: string, status: string) {
+  updateStatus(id: string, status: AppointmentStatus) {
     return this.api.patch<AppointmentResponse>(`/admin/appointments/${id}/status`, { status });
   }
 
@@ -44,8 +49,13 @@ export class AdminApiService {
     return this.api.get<AnalyticsResponse>(`/admin/analytics${qs ? `?${qs}` : ''}`);
   }
 
-  sendBulkSms(recipientSource: string, message: string, statusFilter?: string, manualNumbers?: string) {
-    return this.api.post<{ success: boolean; resultCode: string; recipientCount: number }>(
+  sendBulkSms(
+    recipientSource: SmsRecipientSource,
+    message: string,
+    statusFilter?: AppointmentStatus,
+    manualNumbers?: string
+  ) {
+    return this.api.post<BulkSmsResult>(
       '/admin/sms/bulk',
       { recipientSource, message, statusFilter, manualNumbers }
     );

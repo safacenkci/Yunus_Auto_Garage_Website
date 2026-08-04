@@ -74,7 +74,7 @@
               <td>{{ apt.serviceName }}</td>
               <td><span class="admin-badge" [class]="statusClass(apt.status)">{{ statusLabel(apt.status) }}</span></td>
               <td>
-                @if (apt.status === 'Pending') {
+                @if (isPending(apt.status)) {
                   <div class="flex flex-wrap gap-xs">
                     <button type="button" (click)="askApprove(apt.id)" class="admin-btn admin-btn--secondary admin-btn--sm">Onayla</button>
                     <button type="button" (click)="askReject(apt.id)" class="admin-btn admin-btn--danger admin-btn--sm">Reddet</button>
@@ -98,7 +98,7 @@
             </div>
             <span class="admin-badge shrink-0" [class]="statusClass(apt.status)">{{ statusLabel(apt.status) }}</span>
           </div>
-          @if (apt.status === 'Pending') {
+          @if (isPending(apt.status)) {
             <div class="flex flex-wrap gap-xs mt-auto">
               <button type="button" (click)="askApprove(apt.id)" class="admin-btn admin-btn--secondary admin-btn--sm">Onayla</button>
               <button type="button" (click)="askReject(apt.id)" class="admin-btn admin-btn--danger admin-btn--sm">Reddet</button>

@@ -21,6 +21,7 @@ interface DayOption {
   templateUrl: './booking.html',
 })
 export class BookingComponent implements OnInit {
+  private static readonly OTHER_OPTION = '__other__';
   private readonly fb = inject(FormBuilder);
   private readonly bookingService = inject(BookingService);
   private readonly vehicleService = inject(VehicleService);
@@ -32,6 +33,7 @@ export class BookingComponent implements OnInit {
   readonly step = signal(1);
   readonly services = signal<ServiceDto[]>([]);
   readonly servicesLoading = signal(true);
+  readonly servicesLoadError = signal(false);
   readonly slots = signal<SlotDto[]>([]);
   readonly slotsLoading = signal(false);
   readonly submitting = signal(false);
@@ -48,6 +50,9 @@ export class BookingComponent implements OnInit {
   readonly modelsLoading = signal(false);
   readonly categoriesLoadError = signal(false);
   readonly makesLoadError = signal(false);
+  readonly makeManualEntry = signal(false);
+  readonly modelManualEntry = signal(false);
+  readonly submitAttempted = signal(false);
 
   selectedCategoryId = signal('otomobil');
   selectedMakeId = signal<number | null>(null);
@@ -90,53 +95,23 @@ export class BookingComponent implements OnInit {
     this.form.controls.vehicleModel.disable();
     this.buildDays();
     if (isPlatformBrowser(this.platformId)) {
-      this.form.controls.vehicleMake.valueChanges.subscribe((makeName) => {
-        this.handleMakeSelection(makeName);
-      });
-
       this.bookingService.getServices().subscribe({
         next: (s) => {
-          this.services.set(this.normalizeServices(s));
+          this.services.set(s);
+          this.servicesLoadError.set(false);
           this.servicesLoading.set(false);
         },
         error: () => {
-          this.services.set(this.fallbackServices());
+          this.services.set([]);
+          this.servicesLoadError.set(true);
           this.servicesLoading.set(false);
         },
       });
     } else {
-      this.services.set(this.fallbackServices());
+      this.services.set([]);
+      this.servicesLoadError.set(true);
       this.servicesLoading.set(false);
     }
-  }
-
-  private normalizeServices(apiServices: ServiceDto[]): ServiceDto[] {
-    const retired = new Set<string>(SITE_CONFIG.RETIRED_SERVICE_NAMES);
-    const byName = new Map(
-      apiServices.filter((s) => !retired.has(s.name)).map((s) => [s.name, s])
-    );
-
-    return SITE_CONFIG.BOOKING_SERVICES.flatMap((expected) => {
-      const api = byName.get(expected.title);
-      if (!api) return [];
-
-      return [
-        {
-          ...api,
-          icon: expected.icon,
-          description: expected.description,
-        },
-      ];
-    });
-  }
-
-  private fallbackServices(): ServiceDto[] {
-    return SITE_CONFIG.BOOKING_SERVICES.map((s, index) => ({
-      id: -(index + 1),
-      name: s.title,
-      icon: s.icon,
-      description: s.description,
-    }));
   }
 
   private buildDays() {
@@ -179,13 +154,13 @@ export class BookingComponent implements OnInit {
 
   isOtherService(): boolean {
     const service = this.services().find((s) => s.id === this.selectedServiceId());
-    return service?.name === 'Diğer';
+    return service?.bookingMode === 'note';
   }
 
   serviceOptions(): readonly string[] {
     const service = this.services().find((s) => s.id === this.selectedServiceId());
-    if (!service || service.name === 'Diğer') return [];
-    return SITE_CONFIG.BOOKING_SERVICE_OPTIONS[service.name] ?? [];
+    if (!service || service.bookingMode === 'note') return [];
+    return service.options;
   }
 
   isOptionSelected(option: string): boolean {
@@ -240,6 +215,9 @@ export class BookingComponent implements OnInit {
     this.vehicleService.getCategories().subscribe({
       next: (categories) => {
         this.vehicleCategories.set(categories);
+        if (categories.length > 0 && !categories.some((category) => category.id === this.selectedCategoryId())) {
+          this.selectedCategoryId.set(categories[0].id);
+        }
         this.categoriesLoading.set(false);
         this.loadVehicleMakes(this.selectedCategoryId());
       },
@@ -261,6 +239,7 @@ export class BookingComponent implements OnInit {
       next: (makes) => {
         this.vehicleMakes.set(makes);
         this.makesLoading.set(false);
+        this.makeManualEntry.set(false);
       },
       error: () => {
         this.makesLoadError.set(true);
@@ -272,6 +251,7 @@ export class BookingComponent implements OnInit {
   onCategoryChange() {
     const categoryId = this.selectedCategoryId();
     this.form.controls.vehicleMake.setValue('', { emitEvent: false });
+    this.makeManualEntry.set(false);
     this.resetModelSelect();
     this.vehicleMakes.set([]);
     this.loadVehicleMakes(categoryId);
@@ -284,19 +264,36 @@ export class BookingComponent implements OnInit {
     this.selectedMakeId.set(null);
     this.vehicleModels.set([]);
     this.modelsLoading.set(false);
+    this.modelManualEntry.set(false);
   }
 
-  private handleMakeSelection(makeName: string) {
+  handleMakeSelection(makeName: string) {
     if (!makeName) {
       this.resetModelSelect();
       return;
     }
 
+    if (makeName === BookingComponent.OTHER_OPTION || makeName === 'Diğer') {
+      this.selectedMakeId.set(null);
+      this.makeManualEntry.set(true);
+      this.form.controls.vehicleMake.setValue('', { emitEvent: false });
+      this.form.controls.vehicleModel.enable();
+      this.form.controls.vehicleModel.setValue('');
+      this.form.controls.vehicleModel.markAsUntouched();
+      this.vehicleModels.set([]);
+      this.modelsLoading.set(false);
+      this.modelManualEntry.set(true);
+      return;
+    }
+
     const make = this.vehicleMakes().find((m) => m.name === makeName) ?? null;
+    this.makeManualEntry.set(false);
     this.selectedMakeId.set(make?.id ?? null);
+    this.form.controls.vehicleMake.setValue(makeName, { emitEvent: false });
     this.form.controls.vehicleModel.setValue('');
     this.form.controls.vehicleModel.disable();
     this.vehicleModels.set([]);
+    this.modelManualEntry.set(false);
 
     if (!make) {
       return;
@@ -305,24 +302,67 @@ export class BookingComponent implements OnInit {
     this.modelsLoading.set(true);
     this.vehicleService.getModels(make.id).subscribe({
       next: (models) => {
-        this.vehicleModels.set(models);
+        const usableModels = models.filter((m) => m.name !== 'Diğer');
+        this.vehicleModels.set(usableModels);
         this.modelsLoading.set(false);
-        if (models.length === 0) {
+        if (usableModels.length === 0) {
+          this.form.controls.vehicleModel.enable();
+          this.modelManualEntry.set(true);
           return;
         }
 
         this.form.controls.vehicleModel.enable();
-        if (this.selectedCategoryId() !== 'otomobil' && models.length === 1) {
-          this.form.controls.vehicleModel.setValue(models[0].name);
+        if (this.selectedCategoryId() !== 'otomobil' && usableModels.length === 1) {
+          this.form.controls.vehicleModel.setValue(usableModels[0].name);
         }
       },
       error: () => {
         this.vehicleModels.set([]);
         this.modelsLoading.set(false);
-        this.form.controls.vehicleModel.disable();
+        this.form.controls.vehicleModel.enable();
+        this.modelManualEntry.set(true);
       },
     });
   }
+
+  onMakeSelectChange(makeName: string) {
+    this.handleMakeSelection(makeName);
+  }
+
+  onModelSelectChange(modelName: string) {
+    if (modelName === BookingComponent.OTHER_OPTION || modelName === 'Diğer') {
+      this.selectOtherModel();
+      return;
+    }
+    this.modelManualEntry.set(false);
+    this.form.controls.vehicleModel.enable();
+    this.form.controls.vehicleModel.setValue(modelName, { emitEvent: false });
+  }
+
+  selectableMakes(): VehicleMakeDto[] {
+    return this.vehicleMakes().filter((m) => m.name !== 'Diğer');
+  }
+
+  selectOtherMake() {
+    this.handleMakeSelection(BookingComponent.OTHER_OPTION);
+  }
+
+  selectOtherModel() {
+    this.modelManualEntry.set(true);
+    this.form.controls.vehicleModel.enable();
+    this.form.controls.vehicleModel.setValue('');
+  }
+
+  onManualMakeInput(value: string) {
+    if (!this.makeManualEntry()) return;
+    this.form.controls.vehicleMake.setValue(value, { emitEvent: false });
+  }
+
+  onManualModelInput(value: string) {
+    this.form.controls.vehicleModel.setValue(value, { emitEvent: false });
+  }
+
+  readonly otherOptionValue = BookingComponent.OTHER_OPTION;
 
   goToStep(s: number) {
     this.step.set(s);
@@ -339,6 +379,7 @@ export class BookingComponent implements OnInit {
   }
 
   submit() {
+    this.submitAttempted.set(true);
     if (this.form.invalid || !this.selectedServiceId() || !this.selectedDate() || !this.selectedTime()) {
       this.form.markAllAsTouched();
       return;
@@ -379,6 +420,7 @@ export class BookingComponent implements OnInit {
       .subscribe({
         next: (res) => {
           this.submitting.set(false);
+          this.submitAttempted.set(false);
           this.success.set(res);
         },
         error: (err: HttpErrorResponse) => {
@@ -397,8 +439,8 @@ export class BookingComponent implements OnInit {
   selectedServiceName(): string {
     const service = this.services().find((s) => s.id === this.selectedServiceId());
     if (!service) return '';
-    if (service.name === 'Diğer' && this.customServiceNote()) {
-      return `Diğer — ${this.customServiceNote()}`;
+    if (service.bookingMode === 'note' && this.customServiceNote()) {
+      return `${service.name} — ${this.customServiceNote()}`;
     }
     return service.name;
   }
@@ -437,10 +479,15 @@ export class BookingComponent implements OnInit {
     }
   }
 
+  fieldInvalid(field: string): boolean {
+    const ctrl = this.form.get(field);
+    return !!ctrl?.errors && this.submitAttempted();
+  }
+
   fieldError(field: string): string | null {
     const ctrl = this.form.get(field);
-    if (!ctrl?.touched || !ctrl.errors) return null;
-    if (ctrl.errors['required'] || ctrl.errors['requiredTrue']) return 'Bu alan zorunludur.';
+    if (!ctrl?.errors || !this.submitAttempted()) return null;
+    if (ctrl.errors['required'] || ctrl.errors['requiredTrue']) return 'Bu alanın doldurulması zorunludur.';
     if (ctrl.errors['minlength']) return 'En az 3 karakter giriniz.';
     if (ctrl.errors['pattern']) {
       if (field === 'fullName') return 'Sadece harf giriniz.';

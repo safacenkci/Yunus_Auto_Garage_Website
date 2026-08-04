@@ -5,6 +5,7 @@ import { provideRouter, withInMemoryScrolling } from '@angular/router';
 import { routes } from './app.routes';
 import { authInterceptor } from './core/interceptors/auth.interceptor';
 import { AnalyticsService } from './core/services/analytics.service';
+import { SeoService } from './core/services/seo.service';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -17,6 +18,9 @@ export const appConfig: ApplicationConfig = {
     provideHttpClient(withFetch(), withInterceptors([authInterceptor])),
     provideAppInitializer(() => {
       inject(AnalyticsService).init();
+    }),
+    provideAppInitializer(() => {
+      inject(SeoService).init();
     }),
   ],
 };

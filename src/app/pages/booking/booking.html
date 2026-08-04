@@ -71,6 +71,10 @@
             <div class="bg-surface-container-lowest p-lg rounded-2xl border border-outline-variant/20 animate-pulse h-40"></div>
           }
         </div>
+      } @else if (servicesLoadError() || services().length === 0) {
+        <div class="max-w-2xl mx-auto p-lg rounded-2xl border border-error/20 bg-error-container/40 text-center">
+          <p class="font-body-md text-error">Hizmetler yüklenemedi. Lütfen birazdan tekrar deneyin.</p>
+        </div>
       } @else {
         <div class="grid grid-cols-1 md:grid-cols-2 gap-lg max-w-4xl mx-auto">
           @for (service of services(); track service.id) {
@@ -187,6 +191,7 @@
               id="fullName"
               formControlName="fullName"
               class="form-input"
+              [class.form-input--error]="fieldInvalid('fullName')"
               autocomplete="name"
               (input)="sanitizeFullName($event)"
             />
@@ -198,6 +203,7 @@
               id="phone"
               formControlName="phone"
               class="form-input"
+              [class.form-input--error]="fieldInvalid('phone')"
               type="tel"
               inputmode="tel"
               maxlength="16"
@@ -227,48 +233,115 @@
             }
           </div>
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-md">
-            <div>
+            <div class="min-w-0">
               <label for="vehicleMake" class="font-label-md text-label-md text-on-surface-variant">Araç Marka *</label>
               @if (makesLoading()) {
                 <div class="form-input animate-pulse bg-surface-container-low">&nbsp;</div>
               } @else if (makesLoadError()) {
                 <p class="text-error font-label-sm mt-xs">Markalar yüklenemedi. Sayfayı yenileyip tekrar deneyin.</p>
+                <input
+                  id="vehicleMake"
+                  class="form-input"
+                  [class.form-input--error]="fieldInvalid('vehicleMake')"
+                  [value]="form.controls.vehicleMake.value"
+                  placeholder="Markayı yazın"
+                  (input)="onManualMakeInput($any($event.target).value)"
+                />
+              } @else if (makeManualEntry()) {
+                <div class="flex flex-col gap-sm">
+                  <input
+                    id="vehicleMake"
+                    class="form-input"
+                    [class.form-input--error]="fieldInvalid('vehicleMake')"
+                    [value]="form.controls.vehicleMake.value"
+                    placeholder="Markayı yazın"
+                    (input)="onManualMakeInput($any($event.target).value)"
+                  />
+                  <button type="button" class="text-left text-primary font-label-sm underline underline-offset-2 w-fit" (click)="onCategoryChange()">
+                    Listeden marka seç
+                  </button>
+                </div>
               } @else {
-                <select id="vehicleMake" formControlName="vehicleMake" class="form-input">
-                  <option value="" disabled>Marka seçin</option>
-                  @for (make of vehicleMakes(); track make.id) {
-                    <option [value]="make.name">{{ make.name }}</option>
-                  }
-                </select>
+                <div class="flex flex-col gap-sm">
+                  <select
+                    id="vehicleMake"
+                    formControlName="vehicleMake"
+                    class="form-input"
+                    [class.form-input--error]="fieldInvalid('vehicleMake')"
+                    (change)="onMakeSelectChange($any($event.target).value)"
+                  >
+                    <option value="" disabled>Marka seçin</option>
+                    @for (make of selectableMakes(); track make.id) {
+                      <option [value]="make.name">{{ make.name }}</option>
+                    }
+                  </select>
+                  <button type="button" class="text-left text-primary font-label-sm underline underline-offset-2 w-fit" (click)="selectOtherMake()">
+                    Marka listede yok mu? Diğer
+                  </button>
+                </div>
               }
               @if (fieldError('vehicleMake'); as err) { <p class="text-error font-label-sm mt-xs">{{ err }}</p> }
             </div>
-            <div>
+
+            <div class="min-w-0">
               <label for="vehicleModel" class="font-label-md text-label-md text-on-surface-variant">Araç Model *</label>
-              <select
-                id="vehicleModel"
-                formControlName="vehicleModel"
-                class="form-input"
-                [class.opacity-60]="modelsLoading() || !selectedMakeId()"
-              >
-                <option value="">
-                  @if (modelsLoading()) {
-                    Modeller yükleniyor...
-                  } @else if (selectedMakeId()) {
-                    Model seçin
-                  } @else {
-                    Önce marka seçin
+              @if (modelManualEntry()) {
+                <div class="flex flex-col gap-sm">
+                  <input
+                    id="vehicleModel"
+                    formControlName="vehicleModel"
+                    class="form-input"
+                    [class.form-input--error]="fieldInvalid('vehicleModel')"
+                    placeholder="Modeli yazın"
+                    (input)="onManualModelInput($any($event.target).value)"
+                  />
+                  @if (!makeManualEntry() && vehicleModels().length > 0) {
+                    <button type="button" class="text-left text-primary font-label-sm underline underline-offset-2 w-fit" (click)="handleMakeSelection(form.controls.vehicleMake.value)">
+                      Listeden model seç
+                    </button>
                   }
-                </option>
-                @for (model of vehicleModels(); track model.id) {
-                  <option [value]="model.name">{{ model.name }}</option>
-                }
-              </select>
+                </div>
+              } @else {
+                <div class="flex flex-col gap-sm">
+                  <select
+                    id="vehicleModel"
+                    formControlName="vehicleModel"
+                    class="form-input"
+                    [class.form-input--error]="fieldInvalid('vehicleModel')"
+                    [class.opacity-60]="modelsLoading() || (!selectedMakeId() && !makeManualEntry())"
+                    (change)="onModelSelectChange($any($event.target).value)"
+                  >
+                    <option value="">
+                      @if (modelsLoading()) {
+                        Modeller yükleniyor...
+                      } @else if (selectedMakeId() || makeManualEntry()) {
+                        Model seçin
+                      } @else {
+                        Önce marka seçin
+                      }
+                    </option>
+                    @for (model of vehicleModels(); track model.id) {
+                      <option [value]="model.name">{{ model.name }}</option>
+                    }
+                  </select>
+                  @if (selectedMakeId() && !modelsLoading()) {
+                    <button type="button" class="text-left text-primary font-label-sm underline underline-offset-2 w-fit" (click)="selectOtherModel()">
+                      Model listede yok mu? Diğer
+                    </button>
+                  }
+                </div>
+              }
               @if (fieldError('vehicleModel'); as err) { <p class="text-error font-label-sm mt-xs">{{ err }}</p> }
             </div>
-            <div>
+
+            <div class="min-w-0">
               <label for="vehicleYear" class="font-label-md text-label-md text-on-surface-variant">Araç Yılı *</label>
-              <select id="vehicleYear" formControlName="vehicleYear" class="form-input">
+              <select
+                id="vehicleYear"
+                formControlName="vehicleYear"
+                class="form-input"
+                [class.form-input--error]="fieldInvalid('vehicleYear')"
+              >
                 <option value="" disabled>Yıl seçin</option>
                 @for (year of vehicleYears; track year) {
                   <option [value]="year">{{ year }}</option>
@@ -297,7 +370,11 @@
             </fieldset>
           }
           <label class="flex items-start gap-md cursor-pointer min-h-11 py-sm">
-            <input type="checkbox" formControlName="kvkkConsent" class="mt-1 w-5 h-5 shrink-0" />
+            <input
+              type="checkbox"
+              formControlName="kvkkConsent"
+              class="mt-1 w-5 h-5 shrink-0"
+            />
             <span class="font-body-md text-label-md text-on-surface-variant">
               Kişisel verilerimin randevu oluşturma amacıyla işlenmesini
               <a

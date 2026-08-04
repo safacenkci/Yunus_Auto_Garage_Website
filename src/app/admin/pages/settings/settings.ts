@@ -48,7 +48,7 @@ export class SettingsComponent implements OnInit {
     isEnabled: [true],
     messageText: ['', Validators.required],
     ctaText: ['', Validators.required],
-    ctaLink: ['', Validators.required],
+    ctaLink: [''],
   });
 
   ngOnInit() {
@@ -82,11 +82,11 @@ export class SettingsComponent implements OnInit {
     return adminFieldError(this.form.get(name), this.blockedSubmitted());
   }
 
-  promoFieldInvalid(name: 'messageText' | 'ctaText' | 'ctaLink'): boolean {
+  promoFieldInvalid(name: 'messageText' | 'ctaText'): boolean {
     return adminControlInvalid(this.promoForm.get(name), this.promoSubmitted());
   }
 
-  promoFieldError(name: 'messageText' | 'ctaText' | 'ctaLink'): string | null {
+  promoFieldError(name: 'messageText' | 'ctaText'): string | null {
     return adminFieldError(this.promoForm.get(name), this.promoSubmitted());
   }
 

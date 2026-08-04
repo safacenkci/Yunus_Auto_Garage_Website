@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("YunusAutoGarage.Api")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+2f833e659a4fe3217f040d84e00e320cbd6b013f")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+9e2f9f46bde469ba4f6b2410f0bb12dcb0ecbf16")]
 [assembly: System.Reflection.AssemblyProductAttribute("YunusAutoGarage.Api")]
 [assembly: System.Reflection.AssemblyTitleAttribute("YunusAutoGarage.Api")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

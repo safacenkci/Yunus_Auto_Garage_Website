@@ -1,4 +1,5 @@
 import { GalleryItemDto } from '../models/api.models';
+import type { GalleryMediaType } from '../models/api-contract';
 
 export function isEmbedVideoUrl(url: string): boolean {
   try {
@@ -41,7 +42,7 @@ export function toEmbedUrl(url: string): string {
 }
 
 export function galleryThumbnail(item: GalleryItemDto): string | null {
-  if (item.mediaType === 'Photo') {
+  if (isGalleryMediaType(item.mediaType, 'Photo')) {
     return item.mediaUrl;
   }
 
@@ -54,6 +55,10 @@ export function galleryThumbnail(item: GalleryItemDto): string | null {
   }
 
   return item.mediaUrl;
+}
+
+function isGalleryMediaType(value: string, expected: GalleryMediaType): boolean {
+  return value === expected;
 }
 
 function extractYouTubeId(url: string): string | null {

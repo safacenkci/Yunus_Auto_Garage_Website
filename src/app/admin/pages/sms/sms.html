@@ -39,9 +39,9 @@
         <div>
           <label for="statusFilter" class="font-label-md">Durum Filtresi</label>
           <select id="statusFilter" formControlName="statusFilter" class="admin-input">
-            <option value="Pending">Bekleyen</option>
-            <option value="Confirmed">Onaylı</option>
-            <option value="Completed">Tamamlanan</option>
+            @for (status of statusOptions; track status) {
+              <option [value]="status">{{ statusLabel(status) }}</option>
+            }
           </select>
         </div>
       }

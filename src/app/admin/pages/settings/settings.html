@@ -45,12 +45,8 @@
             id="promoCtaLink"
             formControlName="ctaLink"
             class="admin-input"
-            [class.admin-input--error]="promoFieldInvalid('ctaLink')"
-            placeholder="https://… veya /randevu veya tel:+90…"
+            placeholder="Boş bırakırsanız /randevu kullanılır"
           />
-          @if (promoFieldError('ctaLink'); as err) {
-            <p class="admin-field-error" role="alert">{{ err }}</p>
-          }
         </div>
       </div>
       @if (promoError()) {

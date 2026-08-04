@@ -29,6 +29,17 @@ export const SITE_CONFIG = {
 
   // ─── Site URL (yayınlanacak domain) ──────────────────────
   SITE_URL: 'https://aksarayotoelektrik.com',
+  SEO_DEFAULT_IMAGE_URL: 'https://aksarayotoelektrik.com/assets/og-image.webp',
+  SEO_SERVICE_AREAS: ['Aksaray', 'Aksaray Merkez', 'Bahçesaray', 'Organize Sanayi', 'İç Anadolu'],
+  SEO_PRIMARY_KEYWORDS: [
+    'Aksaray oto elektrik',
+    'Aksaray oto servis',
+    'oto elektrik',
+    'elektronik arıza tespiti',
+    'klima dolumu',
+    'oto tuning',
+    'yerinde oto elektrik hizmeti',
+  ],
 
   // ─── Çalışma Saatleri ────────────────────────────────────
   OPENING_HOURS_DISPLAY: '7 gün 24 saat',
@@ -39,6 +50,11 @@ export const SITE_CONFIG = {
   GOOGLE_BUSINESS_PROFILE_URL: 'https://g.page/BURAYA_GBP_LINKI',
   INSTAGRAM_URL: 'https://instagram.com/BURAYA_INSTAGRAM',
   FACEBOOK_URL: 'https://facebook.com/BURAYA_FACEBOOK',
+  SCHEMA_SAME_AS: [
+    'https://g.page/BURAYA_GBP_LINKI',
+    'https://instagram.com/BURAYA_INSTAGRAM',
+    'https://facebook.com/BURAYA_FACEBOOK',
+  ],
 
   // ─── Görseller ───────────────────────────────────────────
   LOGO_OR_PHOTO_URL: 'https://aksarayotoelektrik.com/assets/logo.webp',
@@ -136,9 +152,9 @@ export const SITE_CONFIG = {
   ],
 
   // ─── SEO Metinleri ───────────────────────────────────────
-  META_TITLE: 'Yunus Auto Garage | Aksaray Oto Servis',
+  META_TITLE: 'Yunus Auto Garage | Aksaray Oto Elektrik ve Oto Servis',
   META_DESCRIPTION:
-    'Aksaray sanayi sitesinde elektronik arıza, klima dolumu ve oto tuning. İlk randevunuzda %20 indirim. Hemen arayın: 0536 239 29 68.',
+    'Aksaray oto elektrik, elektronik arıza tespiti, klima dolumu ve oto tuning hizmetleri. Yunus Auto Garage ile Aksaray Merkez ve çevresinde profesyonel servis.',
 } as const;
 
 /** Ana sayfa navbar / footer bölüm linkleri (fragment id = label eşleşmesi). */

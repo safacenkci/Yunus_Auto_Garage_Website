@@ -1,38 +1,11 @@
 using Microsoft.EntityFrameworkCore;
 using YunusAutoGarage.Api.Data;
+using YunusAutoGarage.Api.Services;
 
 namespace YunusAutoGarage.Api.Data.Seed;
 
 public static class DataSeeder
 {
-    private static readonly (string Name, string Icon, string Description, int SortOrder)[] ActiveServices =
-    [
-        (
-            "Elektronik Arıza",
-            "electric_car",
-            "Bilgisayarlı arıza tespiti, ECU, sensör ve elektrik sistemlerinde uzman çözüm. Modern diagnostik cihazlarla hızlı teşhis.",
-            1
-        ),
-        (
-            "Klima Dolumu",
-            "ac_unit",
-            "Klima gazı dolumu, kaçak kontrolü ve soğutma performansı optimizasyonu. Yaz-kış konforunuz bizim işimiz.",
-            2
-        ),
-        (
-            "Oto Tuning",
-            "format_paint",
-            "Kaporta, boya, far parlatma, pasta cila ve oto aksesuar işlemleri. Aracınıza estetik ve performans kazandırıyoruz.",
-            3
-        ),
-        (
-            "Diğer",
-            "more_horiz",
-            "Listede olmayan bir işlem için talebinizi yazın. Ekibimiz ihtiyacınıza göre size dönüş yapacaktır.",
-            4
-        )
-    ];
-
     private static readonly string[] RetiredServiceNames =
     [
         "Motor Revizyonu",
@@ -75,26 +48,26 @@ public static class DataSeeder
             }
         }
 
-        foreach (var (name, icon, description, sortOrder) in ActiveServices)
+        foreach (var serviceDefinition in ServiceCatalog.Definitions)
         {
-            var service = existing.FirstOrDefault(s => s.Name == name);
+            var service = existing.FirstOrDefault(s => s.Name == serviceDefinition.Name);
             if (service is null)
             {
                 db.Services.Add(new Entities.Service
                 {
-                    Name = name,
-                    Icon = icon,
-                    Description = description,
+                    Name = serviceDefinition.Name,
+                    Icon = serviceDefinition.Icon,
+                    Description = serviceDefinition.Description,
                     IsActive = true,
-                    SortOrder = sortOrder
+                    SortOrder = serviceDefinition.SortOrder
                 });
             }
             else
             {
-                service.Icon = icon;
-                service.Description = description;
+                service.Icon = serviceDefinition.Icon;
+                service.Description = serviceDefinition.Description;
                 service.IsActive = true;
-                service.SortOrder = sortOrder;
+                service.SortOrder = serviceDefinition.SortOrder;
             }
         }
 

@@ -1,13 +1,18 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { AdminApiService } from '../../../core/services/admin-api.service';
 import { DashboardSummary } from '../../../core/models/api.models';
+import {
+  APPOINTMENT_STATUS_BADGES,
+  APPOINTMENT_STATUS_LABELS,
+  type AppointmentStatus,
+} from '../../../core/models/api-contract';
 import { AdminConfirmModalComponent } from '../../shared/admin-confirm-modal.component';
 import { AdminConfirmKind } from '../../shared/admin-confirm.types';
 
 type PendingConfirm = {
   id: string;
   kind: AdminConfirmKind;
-  status: string;
+  status: AppointmentStatus;
   description?: string;
   confirmLabel: string;
   confirmVariant: 'primary' | 'danger';
@@ -66,6 +71,10 @@ export class DashboardComponent implements OnInit {
     });
   }
 
+  isPending(status: AppointmentStatus): boolean {
+    return status === 'Pending';
+  }
+
   closeConfirm() {
     if (this.confirming()) return;
     this.pendingConfirm.set(null);
@@ -88,25 +97,11 @@ export class DashboardComponent implements OnInit {
     });
   }
 
-  statusLabel(status: string): string {
-    const map: Record<string, string> = {
-      Pending: 'Bekliyor',
-      Confirmed: 'Onaylı',
-      Completed: 'Tamamlandı',
-      Cancelled: 'İptal',
-      NoShow: 'Gelmedi',
-    };
-    return map[status] ?? status;
+  statusLabel(status: AppointmentStatus): string {
+    return APPOINTMENT_STATUS_LABELS[status] ?? status;
   }
 
-  statusClass(status: string): string {
-    const map: Record<string, string> = {
-      Pending: 'admin-badge--pending',
-      Confirmed: 'admin-badge--confirmed',
-      Completed: 'admin-badge--completed',
-      Cancelled: 'admin-badge--cancelled',
-      NoShow: 'admin-badge--noshow',
-    };
-    return map[status] ?? '';
+  statusClass(status: AppointmentStatus): string {
+    return APPOINTMENT_STATUS_BADGES[status] ?? '';
   }
 }

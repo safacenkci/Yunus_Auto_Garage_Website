@@ -1,6 +1,14 @@
 namespace YunusAutoGarage.Api.Dtos;
 
-public record ServiceDto(int Id, string Name, string Icon, string Description);
+public record ServiceDto(
+    int Id,
+    string Code,
+    string Name,
+    string Icon,
+    string Description,
+    string BookingMode,
+    IReadOnlyList<string> Options
+);
 
 public record SlotDto(string Time, bool Available);
 

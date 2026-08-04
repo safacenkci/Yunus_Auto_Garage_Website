@@ -6,11 +6,12 @@
     <base href="/" />
 
     <!-- ─── SEO: Title & Description ─────────────────────────── -->
-    <title>Yunus Auto Garage | Aksaray Oto Servis</title>
+    <title>Yunus Auto Garage | Aksaray Oto Elektrik ve Oto Servis</title>
     <meta
       name="description"
-      content="Aksaray sanayi sitesinde elektronik arıza, klima dolumu ve oto tuning. İlk randevunuzda %20 indirim. Hemen arayın: 0536 239 29 68."
+      content="Aksaray oto elektrik, elektronik arıza tespiti, klima dolumu ve oto tuning hizmetleri. Yunus Auto Garage ile Aksaray Merkez ve çevresinde profesyonel servis."
     />
+    <meta name="keywords" content="Aksaray oto elektrik, Aksaray oto servis, oto elektrik, klima dolumu, elektronik arıza, oto tuning" />
     <meta name="robots" content="index, follow" />
     <link rel="canonical" href="https://aksarayotoelektrik.com" />
 
@@ -18,10 +19,10 @@
     <meta property="og:type" content="website" />
     <meta property="og:locale" content="tr_TR" />
     <meta property="og:url" content="https://aksarayotoelektrik.com" />
-    <meta property="og:title" content="Yunus Auto Garage | Aksaray Oto Servis" />
+    <meta property="og:title" content="Yunus Auto Garage | Aksaray Oto Elektrik ve Oto Servis" />
     <meta
       property="og:description"
-      content="Elektronik arıza, klima dolumu ve oto tuning. İlk randevunuzda %20 indirim. Aksaray sanayi sitesinde profesyonel hizmet."
+      content="Aksaray oto elektrik, elektronik arıza tespiti, klima dolumu ve oto tuning hizmetleri. Aksaray Merkez ve çevresinde profesyonel servis."
     />
     <meta property="og:image" content="https://aksarayotoelektrik.com/assets/og-image.webp" />
     <meta property="og:image:width" content="1200" />
@@ -30,10 +31,10 @@
 
     <!-- ─── Twitter Card ─────────────────────────────────────── -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Yunus Auto Garage | Aksaray Oto Servis" />
+    <meta name="twitter:title" content="Yunus Auto Garage | Aksaray Oto Elektrik ve Oto Servis" />
     <meta
       name="twitter:description"
-      content="Elektronik arıza, klima dolumu ve oto tuning. İlk randevunuzda %20 indirim."
+      content="Aksaray oto elektrik, elektronik arıza tespiti, klima dolumu ve oto tuning hizmetleri."
     />
     <meta name="twitter:image" content="https://aksarayotoelektrik.com/assets/og-image.webp" />
 
@@ -181,47 +182,40 @@
     </style>
 
     <!-- ─── JSON-LD Yapısal Veri (AutoRepair schema.org) ──────── -->
-    <script type="application/ld+json">
+    <script type="application/ld+json" id="app-seo-jsonld">
       {
         "@context": "https://schema.org",
-        "@type": "AutoRepair",
-        "name": "Yunus Auto Garage",
-        "image": "https://aksarayotoelektrik.com/assets/logo.webp",
-        "url": "https://aksarayotoelektrik.com",
-        "description": "Elektronik arıza, klima dolumu ve oto tuning. İlk randevunuzda %20 indirim.",
-        "telephone": "+905362392968",
-        "priceRange": "₺₺",
-        "address": {
-          "@type": "PostalAddress",
-          "streetAddress": "8630. Sk., Bahçesaray",
-          "addressLocality": "Aksaray Merkez",
-          "addressRegion": "Aksaray",
-          "postalCode": "68100",
-          "addressCountry": "TR"
-        },
-        "geo": {
-          "@type": "GeoCoordinates",
-          "latitude": "38.310633",
-          "longitude": "33.995505"
-        },
-        "areaServed": "Aksaray",
-        "openingHoursSpecification": [
+        "@graph": [
           {
-            "@type": "OpeningHoursSpecification",
-            "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
-            "opens": "10:00",
-            "closes": "19:00"
+            "@type": "WebSite",
+            "@id": "https://aksarayotoelektrik.com/#website",
+            "url": "https://aksarayotoelektrik.com",
+            "name": "Yunus Auto Garage",
+            "inLanguage": "tr-TR"
+          },
+          {
+            "@type": "AutoRepair",
+            "@id": "https://aksarayotoelektrik.com/#business",
+            "name": "Yunus Auto Garage",
+            "image": "https://aksarayotoelektrik.com/assets/logo.webp",
+            "url": "https://aksarayotoelektrik.com",
+            "description": "Aksaray oto elektrik, elektronik arıza tespiti, klima dolumu ve oto tuning hizmetleri.",
+            "telephone": "+905362392968",
+            "areaServed": ["Aksaray", "Aksaray Merkez", "Bahçesaray"],
+            "address": {
+              "@type": "PostalAddress",
+              "streetAddress": "8630. Sk., Bahçesaray",
+              "addressLocality": "Aksaray Merkez",
+              "addressRegion": "Aksaray",
+              "postalCode": "68100",
+              "addressCountry": "TR"
+            },
+            "geo": {
+              "@type": "GeoCoordinates",
+              "latitude": "38.310633",
+              "longitude": "33.995505"
+            }
           }
-        ],
-        "makesOffer": {
-          "@type": "Offer",
-          "description": "İlk randevunuzda %20 indirim",
-          "priceCurrency": "TRY"
-        },
-        "sameAs": [
-          "https://g.page/BURAYA_GBP_LINKI",
-          "https://instagram.com/BURAYA_INSTAGRAM",
-          "https://facebook.com/BURAYA_FACEBOOK"
         ]
       }
     </script>

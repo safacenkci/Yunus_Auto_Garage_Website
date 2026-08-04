@@ -2,7 +2,8 @@ import { Component, inject, OnDestroy, OnInit, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { AdminApiService } from '../../../core/services/admin-api.service';
 import { GalleryItemDto } from '../../../core/models/api.models';
-import { galleryThumbnail } from '../../../core/utils/gallery-media';
+import { type GalleryMediaType } from '../../../core/models/api-contract';
+import { galleryThumbnail, isEmbedVideoUrl } from '../../../core/utils/gallery-media';
 import { AdminConfirmModalComponent } from '../../shared/admin-confirm-modal.component';
 import { AdminConfirmKind } from '../../shared/admin-confirm.types';
 import {
@@ -37,7 +38,7 @@ export class GalleryAdminComponent implements OnInit, OnDestroy {
   readonly submitted = signal(false);
 
   readonly form = this.fb.nonNullable.group({
-    mediaType: ['Photo' as 'Photo' | 'Video'],
+    mediaType: ['Photo' as GalleryMediaType],
     title: [''],
     sortOrder: [0],
     isActive: [true],
@@ -157,7 +158,7 @@ export class GalleryAdminComponent implements OnInit, OnDestroy {
       title: item.title ?? '',
       sortOrder: item.sortOrder,
       isActive: item.isActive,
-      embedUrl: item.mediaType === 'Video' && item.mediaUrl.startsWith('http') ? item.mediaUrl : '',
+      embedUrl: item.mediaType === 'Video' && isEmbedVideoUrl(item.mediaUrl) ? item.mediaUrl : '',
     });
     this.revokePreview();
     this.selectedFile = null;

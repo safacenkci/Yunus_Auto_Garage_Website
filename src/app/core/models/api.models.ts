@@ -1,8 +1,18 @@
+import type {
+  AppointmentStatus,
+  BookingServiceMode,
+  GalleryMediaType,
+  VehicleWorkStatus,
+} from './api-contract';
+
 export interface ServiceDto {
   id: number;
+  code: string;
   name: string;
   icon: string;
   description: string;
+  bookingMode: BookingServiceMode;
+  options: string[];
 }
 
 export interface SlotDto {
@@ -52,22 +62,22 @@ export interface AppointmentResponse {
   date: string;
   timeSlot: string;
   note: string | null;
-  status: string;
+  status: AppointmentStatus;
   createdAt: string;
   trackingToken: string;
-  vehicleWorkStatus: string;
+  vehicleWorkStatus: VehicleWorkStatus;
   estimatedCompletionAt: string | null;
   trackingNote: string | null;
 }
 
 export interface UpdateVehicleTrackingRequest {
-  vehicleWorkStatus: string;
+  vehicleWorkStatus: VehicleWorkStatus;
   estimatedCompletionAt?: string | null;
   trackingNote?: string | null;
 }
 
 export interface TrackingTimelineStepDto {
-  status: string;
+  status: VehicleWorkStatus;
   label: string;
   completedAt: string | null;
   isCurrent: boolean;
@@ -82,8 +92,8 @@ export interface TrackingResponse {
   serviceName: string;
   appointmentDate: string;
   timeSlot: string;
-  appointmentStatus: string;
-  vehicleWorkStatus: string;
+  appointmentStatus: AppointmentStatus;
+  vehicleWorkStatus: VehicleWorkStatus;
   vehicleWorkStatusLabel: string;
   estimatedCompletionAt: string | null;
   trackingNote: string | null;
@@ -147,7 +157,7 @@ export interface BlockedSlotDto {
 export interface GalleryItemDto {
   id: number;
   title: string | null;
-  mediaType: 'Photo' | 'Video';
+  mediaType: GalleryMediaType;
   mediaUrl: string;
   isActive: boolean;
   sortOrder: number;

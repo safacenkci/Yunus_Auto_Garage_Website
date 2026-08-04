@@ -1,7 +1,7 @@
 <h1 class="admin-page-title">Randevular</h1>
 
 <div class="admin-section flex flex-wrap gap-md">
-  @for (s of ['', 'Pending', 'Confirmed', 'Completed', 'Cancelled']; track s) {
+  @for (s of statusFilterOptions; track s) {
     <button
       type="button"
       class="admin-chip"
@@ -56,11 +56,11 @@
           </td>
           <td>
             <div class="flex flex-wrap gap-xs">
-              @if (apt.status === 'Pending') {
+              @if (isPending(apt.status)) {
                 <button type="button" (click)="askApprove(apt.id)" class="admin-btn admin-btn--secondary admin-btn--sm">Onayla</button>
                 <button type="button" (click)="askReject(apt.id)" class="admin-btn admin-btn--danger admin-btn--sm">Reddet</button>
               }
-              @if (apt.status === 'Confirmed') {
+              @if (isConfirmed(apt.status)) {
                 <button type="button" (click)="askStatusChange(apt.id, 'Completed', 'Tamamlandı', 'secondary')" class="admin-btn admin-btn--outline admin-btn--sm">Tamamlandı</button>
                 <button type="button" (click)="askStatusChange(apt.id, 'NoShow', 'Gelmedi', 'danger')" class="admin-btn admin-btn--danger admin-btn--sm">Gelmedi</button>
               }
@@ -100,11 +100,11 @@
         </p>
       }
       <div class="flex flex-wrap gap-xs mt-sm">
-        @if (apt.status === 'Pending') {
+        @if (isPending(apt.status)) {
           <button type="button" (click)="askApprove(apt.id)" class="admin-btn admin-btn--secondary admin-btn--sm">Onayla</button>
           <button type="button" (click)="askReject(apt.id)" class="admin-btn admin-btn--danger admin-btn--sm">Reddet</button>
         }
-        @if (apt.status === 'Confirmed') {
+        @if (isConfirmed(apt.status)) {
           <button type="button" (click)="askStatusChange(apt.id, 'Completed', 'Tamamlandı', 'secondary')" class="admin-btn admin-btn--outline admin-btn--sm">Tamamlandı</button>
           <button type="button" (click)="askStatusChange(apt.id, 'NoShow', 'Gelmedi', 'danger')" class="admin-btn admin-btn--danger admin-btn--sm">Gelmedi</button>
         }
